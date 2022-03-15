@@ -1,5 +1,5 @@
 <?php
-namespace gamboamartin\plugins;
+namespace gamboamartin\plugins\exportador;
 use gamboamartin\errores\errores;
 use JsonException;
 use stdClass;
