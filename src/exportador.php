@@ -102,8 +102,8 @@ class exportador{
             die('Error');
         }
 
-        $llenado = (new datos())->llena_libro_xls(estilo_contenido:$this->estilo_contenido, estilos: $this->estilos,
-            index: $index, keys: $keys,libro: $libro, path_base: $path_base,
+        $llenado = (new datos())->llena_libro_xls(columnas:$this->columnas, estilo_contenido:$this->estilo_contenido,
+            estilos: $this->estilos, index: $index, keys: $keys,libro: $libro, path_base: $path_base,
             registros: $registros, totales:  $totales);
 
         if(errores::$error){

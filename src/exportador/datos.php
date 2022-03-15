@@ -67,6 +67,7 @@ class datos{
     /**
      * PARAMS ORDER INTERNALS
      * @param string $campo
+     * @param array $columnas
      * @param array $estilo_contenido
      * @param array $estilos
      * @param int $fila
@@ -78,8 +79,9 @@ class datos{
      * @return array
      * @throws JsonException
      */
-    private function llena_datos_xls(string $campo, array $estilo_contenido, array $estilos, int $fila, int $index,
-                                    Spreadsheet $libro, int $numero_columna, string $path_base, array $registro): array
+    private function llena_datos_xls(string $campo, array $columnas, array $estilo_contenido, array $estilos,
+                                     int $fila, int $index, Spreadsheet $libro, int $numero_columna,
+                                     string $path_base, array $registro): array
     {
 
         if($numero_columna<0){
@@ -88,7 +90,7 @@ class datos{
         if($fila<0){
             return $this->error->error('Error $fila debe ser mayor o igual a 0',$fila);
         }
-        if(!isset($this->columnas[$numero_columna])){
+        if(!isset($columnas[$numero_columna])){
             return $this->error->error('Error la columna en la posicion '.$numero_columna.' no existe',
                 $numero_columna);
         }
@@ -98,7 +100,7 @@ class datos{
                 return $this->error->error('Error $registro['.$campo.'] debe ser un string', $registro);
             }
             $valor = trim($registro[$campo]);
-            $celda = $this->columnas[$numero_columna] . $fila;
+            $celda = $columnas[$numero_columna] . $fila;
 
             $estilo = (new estilos())->estilos_format(path_base: $path_base,valor:  $valor);
             if(errores::$error){
@@ -125,6 +127,7 @@ class datos{
 
     /**
      * PARAMS ORDER INTERNALS
+     * @param array $columnas
      * @param array $estilo_contenido
      * @param array $estilos
      * @param int $index
@@ -136,7 +139,7 @@ class datos{
      * @return array
      * @throws JsonException
      */
-    public function llena_libro_xls(array $estilo_contenido, array $estilos, int $index, array $keys,
+    public function llena_libro_xls(array $columnas, array $estilo_contenido, array $estilos, int $index, array $keys,
                                      Spreadsheet $libro, string $path_base, array $registros, array $totales ): array
     {
         $fila = 2;
@@ -144,12 +147,12 @@ class datos{
             if(!is_array($registro)){
                 return $this->error->error('Error registro debe ser un array',$registro);
             }
-            $llenado = $this->llena_registro_xls(estilo_contenido:$estilo_contenido, estilos: $estilos,
-                fila: $fila, index: $index, keys: $keys, libro: $libro, path_base: $path_base, registro: $registro);
+            $llenado = $this->llena_registro_xls(columnas:$columnas, estilo_contenido:$estilo_contenido,
+                estilos: $estilos, fila: $fila, index: $index, keys: $keys, libro: $libro, path_base: $path_base,
+                registro: $registro);
 
             if(errores::$error){
-                return $this->error->error('Error al aplicar $llenado',
-                    $llenado);
+                return $this->error->error('Error al aplicar $llenado', $llenado);
             }
 
             $fila++;
@@ -177,6 +180,7 @@ class datos{
 
     /**
      * PARAMS-ORDER INTERNALS
+     * @param array $columnas
      * @param array $estilo_contenido
      * @param array $estilos
      * @param int $fila
@@ -188,12 +192,13 @@ class datos{
      * @return array
      * @throws JsonException
      */
-    private function llena_registro_xls(array $estilo_contenido, array $estilos, int $fila, int $index, array $keys,
-                                        Spreadsheet$libro, string $path_base, array $registro):array{
+    private function llena_registro_xls(array $columnas, array $estilo_contenido, array $estilos, int $fila,
+                                        int $index, array $keys, Spreadsheet$libro, string $path_base,
+                                        array $registro):array{
         $i=0;
         $data=array();
         foreach($keys as $campo){
-            $llenado = $this->llena_datos_xls(campo: $campo,estilo_contenido: $estilo_contenido,
+            $llenado = $this->llena_datos_xls(campo: $campo, columnas: $columnas,estilo_contenido: $estilo_contenido,
                 estilos: $estilos, fila: $fila, index:  $index, libro: $libro, numero_columna:$i,
                 path_base: $path_base, registro: $registro);
             if(errores::$error){
