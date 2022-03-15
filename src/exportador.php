@@ -1,6 +1,9 @@
 <?php
 namespace gamboamartin\plugins;
 use gamboamartin\errores\errores;
+use gamboamartin\plugins\exportador\datos;
+use gamboamartin\plugins\exportador\estilos;
+use gamboamartin\plugins\exportador\output;
 use JsonException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
