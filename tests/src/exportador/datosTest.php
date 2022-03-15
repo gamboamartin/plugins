@@ -41,5 +41,66 @@ class datosTest extends test {
         errores::$error = false;
     }
 
+    public function test_genera_encabezados(){
+        errores::$error = false;
+        $datos = new datos();
+        //$inicializacion = new liberator($inicializacion);
+
+        $columnas = array();
+        $index = 0;
+        $keys = array();
+        $libro = new Spreadsheet();
+        $resultado = $datos->genera_encabezados(columnas: $columnas, index: $index,keys:  $keys,libro:  $libro);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+        $columnas = array();
+        $index = 0;
+        $keys = array();
+        $libro = new Spreadsheet();
+        $keys[] = '';
+        $resultado = $datos->genera_encabezados(columnas: $columnas, index: $index,keys:  $keys,libro:  $libro);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error key esta vacio", $resultado['mensaje']);
+
+        errores::$error = false;
+        $columnas = array();
+        $index = 0;
+        $keys = array();
+        $libro = new Spreadsheet();
+        $keys[] = 'a';
+        $resultado = $datos->genera_encabezados(columnas: $columnas, index: $index,keys:  $keys,libro:  $libro);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error no existe columnas[0]", $resultado['mensaje']);
+
+        errores::$error = false;
+        $columnas = array();
+        $index = 0;
+        $keys = array();
+        $libro = new Spreadsheet();
+        $keys[] = 'a';
+        $columnas[0] = '';
+        $resultado = $datos->genera_encabezados(columnas: $columnas, index: $index,keys:  $keys,libro:  $libro);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error esta vacia la coordenada columnas[0]", $resultado['mensaje']);
+
+        errores::$error = false;
+        $columnas = array();
+        $index = 0;
+        $keys = array();
+        $libro = new Spreadsheet();
+        $keys[] = 'a';
+        $columnas[0] = 'A';
+        $resultado = $datos->genera_encabezados(columnas: $columnas, index: $index,keys:  $keys,libro:  $libro);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertTrue($resultado);
+        errores::$error = false;
+    }
+
 
 }

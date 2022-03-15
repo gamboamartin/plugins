@@ -10,7 +10,7 @@ class files{
     }
 
     /**
-     *
+     * P ORDER P INT
      * Funcion guarda el documento en la ruta definida
      *
      * @param string $ruta_file Ruta fisica donde está guardado el documento en el server
@@ -23,7 +23,7 @@ class files{
      * @uses formato_valuador
      * @uses todo el sistema
      */
-    public function guarda_archivo_fisico(string $ruta_file, string $contenido_file):string|array{
+    public function guarda_archivo_fisico(string $contenido_file, string $ruta_file):string|array{
         if($ruta_file === ''){
             return $this->error->error('Error $ruta_file esta vacia', $ruta_file);
         }
@@ -38,12 +38,18 @@ class files{
         return $ruta_file;
     }
 
+    /**
+     * P ORDER P INT
+     * @param string $ruta
+     * @param array $datas
+     * @return array
+     */
     public function listar_archivos(string $ruta, array $datas = array()):array{
         if (is_dir($ruta)) {
             if ($dh = opendir($ruta)) {
                 while (($file = readdir($dh)) !== false) {
                     if (is_dir($ruta . $file) && $file !== "." && $file !== ".."){
-                        $datas = $this->listar_archivos($ruta . $file . "/", $datas);
+                        $datas = $this->listar_archivos(ruta: $ruta . $file . "/",datas:  $datas);
                     }
                     if(($file !== "." && $file !== "..")){
                         $datas[] = $ruta.$file;
@@ -58,7 +64,15 @@ class files{
         return $datas;
     }
 
-    public function rmdir_recursive(string $dir, $data = array(), bool $mismo = false) {
+    /**
+     * P ORDER P INT
+     * @param string $dir
+     * @param array $data
+     * @param bool $mismo
+     * @return array|mixed
+     */
+    public function rmdir_recursive(string $dir, array $data = array(), bool $mismo = false): mixed
+    {
         $files = scandir($dir);
         array_shift($files);    // remove '.' from array
         array_shift($files);    // remove '..' from array
@@ -66,7 +80,7 @@ class files{
         foreach ($files as $file) {
             $file = $dir . '/' . $file;
             if (is_dir($file)) {
-                $data = $this->rmdir_recursive($file, $data);
+                $data = $this->rmdir_recursive(dir: $file, data: $data);
                 rmdir($file);
             } else {
                 unlink($file);

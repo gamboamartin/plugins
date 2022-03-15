@@ -39,29 +39,37 @@ class datos{
     }
 
     /**
-     * PARAMS ORDER INTERNALS
+     * PROBADO PARAMS ORDER INTERNALS
      * @param array $columnas
      * @param int $index
      * @param array $keys
      * @param Spreadsheet $libro
-     * @return string[]
+     * @return array|bool
      */
-    public function genera_encabezados(array $columnas, int $index, array $keys,Spreadsheet $libro ): array
+    public function genera_encabezados(array $columnas, int $index, array $keys,Spreadsheet $libro ): array|bool
     {
         $fila = 1;
         $i = 0;
         foreach($keys as $key){
+            $key = trim($key);
+            if($key === ''){
+                return $this->error->error('Error key esta vacio', $key);
+            }
+            if(!isset($columnas[$i])){
+                return $this->error->error("Error no existe columnas[$i]", $columnas);
+            }
+            if(trim($columnas[$i]) === ''){
+                return $this->error->error("Error esta vacia la coordenada columnas[$i]", $columnas);
+            }
             try {
-                $libro->setActiveSheetIndex($index)
-                    ->setCellValue($columnas[$i] . $fila, $key);
+                $libro->setActiveSheetIndex($index)->setCellValue($columnas[$i] . $fila, $key);
                 $i++;
             }
             catch (Throwable $e){
-                return $this->error->error('Error al aplicar key en xls',
-                    array($e,$columnas[$i],$fila,$key));
+                return $this->error->error('Error al aplicar key en xls', $e);
             }
         }
-        return array('mensaje'=>'encabezados aplicados');
+        return true;
     }
 
     /**
