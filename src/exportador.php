@@ -196,10 +196,4 @@ class exportador{
         exit;
     }
 
-
-
-
-
-
-
 }
