@@ -50,9 +50,12 @@ class files{
                 while (($file = readdir($dh)) !== false) {
                     if (is_dir($ruta . $file) && $file !== "." && $file !== ".."){
                         $datas = $this->listar_archivos(ruta: $ruta . $file . "/",datas:  $datas);
+                        if(errores::$error){
+                            return $this->error->error('Error al listar archivos', $datas);
+                        }
                     }
                     if(($file !== "." && $file !== "..")){
-                        $datas[] = $ruta.$file;
+                        $datas[] = $ruta.'/'.$file;
                     }
                 }
                 closedir($dh);
