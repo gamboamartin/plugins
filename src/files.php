@@ -2,11 +2,33 @@
 namespace gamboamartin\plugins;
 use gamboamartin\errores\errores;
 use JetBrains\PhpStorm\Pure;
+use SplFileInfo;
 
 class files{
     private errores $error;
     #[Pure] public function __construct(){
         $this->error = new errores();
+    }
+
+    /**
+     * Obtiene la extension de un archivo mandando solamente el nombre del doc
+     * @param string $archivo Path o nombre del archivo
+     * @return string|array string = extension del archivo array error
+     * @version 1.0.0
+     */
+    public function extension(string $archivo): string|array
+    {
+        $archivo = trim($archivo);
+        if($archivo === ''){
+            return $this->error->error(mensaje: 'Error archivo no puede venir vacio', data: $archivo);
+        }
+        $explode = explode('.', $archivo);
+        if(count($explode) === 1){
+            return $this->error->error(mensaje: 'Error el archivo no tiene extension', data: $explode);
+        }
+
+        return (new SplFileInfo($archivo))->getExtension();
+
     }
 
     /**
