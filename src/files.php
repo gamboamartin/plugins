@@ -12,6 +12,7 @@ class files{
 
     /**
      * Te dice el archivo es un lock del paquete servicios
+     * @version 1.0.0
      * @param string $archivo Path o nombre del archivo
      * @return bool|array verdadero si es lock falso si no, array error
      */
