@@ -11,6 +11,29 @@ class files{
     }
 
     /**
+     * Te dice el archivo es un lock del paquete servicios
+     * @param string $archivo Path o nombre del archivo
+     * @return bool|array verdadero si es lock falso si no, array error
+     */
+    public function es_lock_service(string $archivo): bool|array
+    {
+        $valida = $this->valida_extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar extension', data: $valida);
+        }
+
+        $extension = $this->extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener extension', data: $extension);
+        }
+        $es_lock = false;
+        if($extension === 'lock'){
+            $es_lock = true;
+        }
+        return $es_lock;
+    }
+
+    /**
      * Obtiene la extension de un archivo mandando solamente el nombre del doc
      * @param string $archivo Path o nombre del archivo
      * @return string|array string = extension del archivo array error
@@ -18,13 +41,9 @@ class files{
      */
     public function extension(string $archivo): string|array
     {
-        $archivo = trim($archivo);
-        if($archivo === ''){
-            return $this->error->error(mensaje: 'Error archivo no puede venir vacio', data: $archivo);
-        }
-        $explode = explode('.', $archivo);
-        if(count($explode) === 1){
-            return $this->error->error(mensaje: 'Error el archivo no tiene extension', data: $explode);
+        $valida = $this->valida_extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar extension', data: $valida);
         }
 
         return (new SplFileInfo($archivo))->getExtension();
@@ -116,5 +135,36 @@ class files{
             rmdir($dir);
         }
         return $data;
+    }
+
+    /**
+     * Valida los datos de un archivo para obtener una extension
+     * @param string $archivo
+     * @return bool|array
+     */
+    private function valida_extension(string $archivo): bool|array
+    {
+        $archivo = trim($archivo);
+        if($archivo === ''){
+            return $this->error->error(mensaje: 'Error archivo no puede venir vacio', data: $archivo);
+        }
+        $explode = explode('.', $archivo);
+        if(count($explode) === 1){
+            return $this->error->error(mensaje: 'Error el archivo no tiene extension', data: $explode);
+        }
+
+        $todo_vacio = true;
+        foreach ($explode as $parte){
+            $parte = trim($parte);
+            if($parte !== ''){
+                $todo_vacio = false;
+            }
+        }
+        if($todo_vacio){
+            return $this->error->error(mensaje: 'Error el archivo solo tiene puntos', data: $archivo);
+        }
+
+
+        return true;
     }
 }
