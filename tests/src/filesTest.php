@@ -39,6 +39,16 @@ class filesTest extends test {
 
         errores::$error = false;
 
+
+        $archivo = 'a.info.php.lock';
+        $resultado = $fl->asigna_data_file_service($archivo);
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("a.info", $resultado->name_service);
+
+
+        errores::$error = false;
+
     }
 
     public function test_es_info_service()
@@ -168,6 +178,30 @@ class filesTest extends test {
         $this->assertEquals("w", $resultado);
 
         errores::$error = false;
+    }
+
+    public function test_files_services()
+    {
+        errores::$error = false;
+        $fl = new files();
+        //$fl = new liberator($fl);
+
+        $directorio = '';
+        $resultado = $fl->files_services($directorio);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error el directorio no puede ser un string", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $directorio = opendir('/var/www/html/plugins/src/');
+        $resultado = $fl->files_services($directorio);
+        print_r($resultado);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+
     }
 
     public function test_parte_to_name_file()

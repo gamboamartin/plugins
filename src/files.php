@@ -37,15 +37,25 @@ class files{
             return $this->error->error(mensaje:  'Error al verificar file',data: $es_service);
         }
 
+        $name_service = $this->name_service(archivo:$archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al obtener nombre del servicio',data: $name_service);
+        }
+
+        $explode_name = explode('.php', $archivo);
+        $name_service = $explode_name[0];
+
         $data = new stdClass();
         $data->file = $archivo;
         $data->es_lock = $es_lock;
         $data->es_info = $es_info;
         $data->es_service = $es_service;
+        $data->name_service = $name_service;
 
 
         return $data;
     }
+
     /**
      * Determina si el archivo es de tipo info para services
      * @version 1.0.0
@@ -136,24 +146,35 @@ class files{
     }
 
     /**
+     * Ajusta los archivos dentro de la carpeta services para su maquetacion
+     * @version 1.0.0
      * @param mixed $directorio Recurso tipo opendir
-     * @return array
+     * @return array un arreglo de objetos
      */
     public function files_services(mixed $directorio): array
     {
+        if(is_string($directorio)){
+            return $this->error->error(mensaje:  'Error el directorio no puede ser un string',data: $directorio);
+        }
         $archivos = array();
         while ($archivo = readdir($directorio)){
-            if (!is_dir($archivo)) {
-                if($archivo === 'index.php' || $archivo === 'init.php'){
-                    continue;
-                }
-                $data = $this->asigna_data_file_service(archivo: $archivo);
-                if(errores::$error){
-                    return $this->error->error(mensaje:  'Error al asignar file',data: $data);
-                }
-                $archivos[] = $data;
+            if(is_dir($archivo)){
+                continue;
             }
+            if($archivo === 'index.php' || $archivo === 'init.php'){
+                continue;
+            }
+            $tiene_extension = $this->tiene_extension(archivo: $archivo);
+            if(!$tiene_extension){
+                continue;
+            }
+            $data = $this->asigna_data_file_service(archivo: $archivo);
+            if(errores::$error){
+                return $this->error->error(mensaje:  'Error al asignar file',data: $data);
+            }
+            $archivos[] = $data;
         }
+
         asort($archivos);
         return $archivos;
     }
@@ -243,6 +264,12 @@ class files{
         return $muestra;
     }
 
+    private function name_service(string $archivo): string
+    {
+        $explode_name = explode('.php', $archivo);
+        return $explode_name[0];
+    }
+
     /**
      * Verifica si la parte enviada esta vacia o no
      * @version 1.0.0
@@ -286,6 +313,16 @@ class files{
             rmdir($dir);
         }
         return $data;
+    }
+
+    private function tiene_extension(string $archivo): bool
+    {
+        $tiene_extension = true;
+        $explode = explode('.', $archivo);
+        if(count($explode) === 1){
+            $tiene_extension = false;
+        }
+        return $tiene_extension;
     }
 
     /**
