@@ -333,6 +333,7 @@ class files{
 
     /**
      * Maqueta los archivos para dar salida a un array con los servicios a mostrar en un index
+     * @version 1.0.0
      * @param array $archivos conjunto de datos de archivos para su maquetacion
      * @return array
      */
