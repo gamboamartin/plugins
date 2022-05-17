@@ -64,7 +64,7 @@ class files{
      */
     private function asigna_data_service(stdClass $archivo, array $servicio): array
     {
-        $keys = array('es_service','es_lock','es_info');
+        $keys = array('es_service','es_lock','es_info','file');
         $valida = (new validacion())->valida_existencia_keys(keys:$keys, registro: $archivo, valida_vacio: false);
         if(errores::$error){
             return $this->error->error('Error al validar archivo', $valida);
@@ -81,8 +81,26 @@ class files{
         return $servicio;
     }
 
+    /**
+     * Se asignan los archivos de una carpeta de servicios
+     * @param stdClass $archivo datos ocn ruta del servicio
+     * @param array $servicios conjunto de servicios recursivos
+     * @return array retorna los servicios ajustados
+     */
     private function asigna_servicios(stdClass $archivo, array $servicios): array
     {
+        $keys = array('name_service');
+        $valida = (new validacion())->valida_existencia_keys(keys:$keys, registro: $archivo, valida_vacio: false);
+        if(errores::$error){
+            return $this->error->error('Error al validar archivo', $valida);
+        }
+
+        $keys = array('es_service','es_lock','es_info','file');
+        $valida = (new validacion())->valida_existencia_keys(keys:$keys, registro: $archivo, valida_vacio: false);
+        if(errores::$error){
+            return $this->error->error('Error al validar archivo', $valida);
+        }
+
         if(!isset($servicios[$archivo->name_service])){
             $servicios[$archivo->name_service] = array();
         }
@@ -191,7 +209,7 @@ class files{
      * @param mixed $directorio Recurso tipo opendir
      * @return array un arreglo de objetos
      */
-    public function files_services(mixed $directorio): array
+    private function files_services(mixed $directorio): array
     {
         if(is_string($directorio)){
             return $this->error->error(mensaje:  'Error el directorio no puede ser un string',data: $directorio);
@@ -217,6 +235,20 @@ class files{
 
         asort($archivos);
         return $archivos;
+    }
+
+    public function get_files_services(mixed $directorio): array
+    {
+        $archivos = $this->files_services(directorio: $directorio);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al asignar files',data: $archivos);
+        }
+
+        $servicios = $this->maqueta_files_service($archivos);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al maquetar files',data: $servicios);
+        }
+        return $servicios;
     }
 
     /**
@@ -277,7 +309,7 @@ class files{
         return $datas;
     }
 
-    public function maqueta_files_service(array $archivos): array
+    private function maqueta_files_service(array $archivos): array
     {
         $servicios = array();
         foreach($archivos as $archivo){

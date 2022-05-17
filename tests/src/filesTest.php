@@ -61,8 +61,27 @@ class filesTest extends test {
         $archivo->es_service = false;
         $archivo->es_lock = false;
         $archivo->es_info = false;
+        $archivo->file = 'a';
         $servicio = array();
         $resultado = $fl->asigna_data_service($archivo, $servicio);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+    }
+
+    public function test_asigna_servicios(){
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivo = new stdClass();
+        $archivo->name_service = 'a';
+        $archivo->es_service = true;
+        $archivo->es_info = false;
+        $archivo->es_lock = false;
+        $archivo->file = 'a';
+        $servicios = array();
+        $resultado = $fl->asigna_servicios($archivo, $servicios);
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
         errores::$error = false;
@@ -201,7 +220,7 @@ class filesTest extends test {
     {
         errores::$error = false;
         $fl = new files();
-        //$fl = new liberator($fl);
+        $fl = new liberator($fl);
 
         $directorio = '';
         $resultado = $fl->files_services($directorio);
