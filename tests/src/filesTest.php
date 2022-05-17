@@ -5,7 +5,7 @@ use gamboamartin\errores\errores;
 use gamboamartin\plugins\files;
 use gamboamartin\test\liberator;
 use gamboamartin\test\test;
-
+use stdClass;
 
 
 class filesTest extends test {
@@ -49,6 +49,23 @@ class filesTest extends test {
 
         errores::$error = false;
 
+    }
+
+    public function test_asigna_data_service()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivo = new stdClass();
+        $archivo->es_service = false;
+        $archivo->es_lock = false;
+        $archivo->es_info = false;
+        $servicio = array();
+        $resultado = $fl->asigna_data_service($archivo, $servicio);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
     }
 
     public function test_es_info_service()

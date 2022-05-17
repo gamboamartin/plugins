@@ -1,6 +1,7 @@
 <?php
 namespace gamboamartin\plugins;
 use gamboamartin\errores\errores;
+use gamboamartin\validacion\validacion;
 use JetBrains\PhpStorm\Pure;
 use SplFileInfo;
 use stdClass;
@@ -56,12 +57,18 @@ class files{
 
     /**
      * Se asignan los datos de un servicio
+     * @version 1.0.0
      * @param stdClass $archivo File de services a verificar
      * @param array $servicio servicio en verificacion
      * @return array
      */
     private function asigna_data_service(stdClass $archivo, array $servicio): array
     {
+        $keys = array('es_service','es_lock','es_info');
+        $valida = (new validacion())->valida_existencia_keys(keys:$keys, registro: $archivo, valida_vacio: false);
+        if(errores::$error){
+            return $this->error->error('Error al validar archivo', $valida);
+        }
         if($archivo->es_service){
             $servicio['file'] =  $archivo->file;
         }
@@ -72,6 +79,20 @@ class files{
             $servicio['file_info'] =  $archivo->file;
         }
         return $servicio;
+    }
+
+    private function asigna_servicios(stdClass $archivo, array $servicios): array
+    {
+        if(!isset($servicios[$archivo->name_service])){
+            $servicios[$archivo->name_service] = array();
+        }
+        $servicio = $servicios[$archivo->name_service];
+        $service = $this->asigna_data_service(archivo: $archivo, servicio: $servicio);
+        if(errores::$error){
+            return $this->error->error('Error al asignar datos', $service);
+        }
+        $servicios[$archivo->name_service] = $service;
+        return $servicios;
     }
 
 
@@ -260,16 +281,10 @@ class files{
     {
         $servicios = array();
         foreach($archivos as $archivo){
-            if(!isset($servicios[$archivo->name_service])){
-                $servicios[$archivo->name_service] = array();
-            }
-            $servicio = $servicios[$archivo->name_service];
-            $service = $this->asigna_data_service(archivo: $archivo, servicio: $servicio);
+            $servicios = $this->asigna_servicios(archivo: $archivo,servicios: $servicios);
             if(errores::$error){
-                return $this->error->error('Error al asignar datos', $service);
+                return $this->error->error('Error al asignar datos servicios', $servicios);
             }
-            $servicios[$archivo->name_service] = $service;
-
         }
         return $servicios;
     }
