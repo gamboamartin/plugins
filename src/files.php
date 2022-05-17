@@ -14,7 +14,7 @@ class files{
     /**
      * Asigna los datos necesarios para verificar los archivos de un servicio
      * @param string $archivo Path o nombre del archivo
-     * @return array|stdClass obj->file obj->es_lock obj->es_info
+     * @return array|stdClass obj->file obj->es_lock obj->es_info obj->es_service
      */
     private function asigna_data_file_service(string $archivo): array|stdClass
     {
@@ -26,10 +26,15 @@ class files{
         if(errores::$error){
             return $this->error->error(mensaje:  'Error al verificar file',data: $es_info);
         }
+        $es_service = $this->es_service(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al verificar file',data: $es_service);
+        }
         $data = new stdClass();
         $data->file = $archivo;
         $data->es_lock = $es_lock;
         $data->es_info = $es_info;
+        $data->es_service = $es_service;
 
         return $data;
     }
@@ -74,11 +79,34 @@ class files{
         if(errores::$error){
             return $this->error->error(mensaje: 'Error al obtener extension', data: $extension);
         }
-        $es_lock = false;
+        $es_info = false;
         if($extension === 'lock'){
-            $es_lock = true;
+            $es_info = true;
         }
-        return $es_lock;
+        return $es_info;
+    }
+
+    /**
+     * Determina si un file es un service para ejecucion de servicios
+     * @param string $archivo Ruta a verificar el tipo
+     * @return bool|array
+     */
+    private function es_service(string $archivo): bool|array
+    {
+        $valida = $this->valida_extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar extension', data: $valida);
+        }
+
+        $extension = $this->extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener extension', data: $extension);
+        }
+        $es_service = false;
+        if($extension === 'php'){
+            $es_service = true;
+        }
+        return $es_service;
     }
 
     /**

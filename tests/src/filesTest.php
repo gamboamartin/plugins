@@ -76,6 +76,44 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_es_service()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivo = '';
+        $resultado = $fl->es_service($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error al validar extension", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $archivo = '.';
+        $resultado = $fl->es_service($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error al validar extension", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $archivo = 'x.z';
+        $resultado = $fl->es_service($archivo);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertNotTrue($resultado);
+
+        errores::$error = false;
+
+        $archivo = 'x.php';
+        $resultado = $fl->es_service($archivo);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertTrue($resultado);
+        errores::$error = false;
+    }
+
     public function test_extension(){
         errores::$error = false;
         $fl = new files();
