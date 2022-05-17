@@ -180,6 +180,7 @@ class files{
 
     /**
      * Verificar si todas las partes de un name file estan vacias
+     * @version 1.0.0
      * @param array $explode conjunto de partes del nombre de un name file separados por .
      * @return bool|array Verdadero si todos los elementos estan vacios
      */
@@ -231,6 +232,9 @@ class files{
     public function muestra_en_service(stdClass $archivo): bool
     {
         $muestra = true;
+        if(is_dir($archivo->file)){
+            $muestra = false;
+        }
         if($archivo->file==='index.php'){
             $muestra = false;
         }
@@ -243,6 +247,7 @@ class files{
         if($archivo->es_info){
             $muestra = false;
         }
+
         return $muestra;
     }
 }

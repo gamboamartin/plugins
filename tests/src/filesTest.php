@@ -105,6 +105,19 @@ class filesTest extends test {
         errores::$error = false;
 
     }
+    public function test_todo_vacio()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $explode = array();
+        $resultado = $fl->todo_vacio($explode);
+        $this->assertIsBool($resultado);
+        $this->assertTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+    }
 
 
     }
