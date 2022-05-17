@@ -11,6 +11,29 @@ class files{
     }
 
     /**
+     * Determina si el archivo es de tipo info para services
+     * @param string $archivo Ruta a verificar el tipo
+     * @return bool|array
+     */
+    public function es_info_service(string $archivo): bool|array
+    {
+        $valida = $this->valida_extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar extension', data: $valida);
+        }
+
+        $extension = $this->extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener extension', data: $extension);
+        }
+        $es_lock = false;
+        if($extension === 'info'){
+            $es_lock = true;
+        }
+        return $es_lock;
+    }
+
+    /**
      * Te dice el archivo es un lock del paquete servicios
      * @version 1.0.0
      * @param string $archivo Path o nombre del archivo
@@ -110,6 +133,21 @@ class files{
     }
 
     /**
+     * Verifica si la parte enviada esta vacia o no
+     * @param string $parte Parte de un name file
+     * @return bool
+     */
+    private function parte_to_name_file(string $parte): bool
+    {
+        $todo_vacio = true;
+        $parte = trim($parte);
+        if($parte !== ''){
+            $todo_vacio = false;
+        }
+        return $todo_vacio;
+    }
+
+    /**
      * P ORDER P INT
      * @param string $dir
      * @param array $data
@@ -139,8 +177,25 @@ class files{
     }
 
     /**
+     * Verificar si todas las partes de un name file estan vacias
+     * @param array $explode conjunto de partes del nombre de un name file separados por .
+     * @return bool|array Verdadero si todos los elementos estan vacios
+     */
+    private function todo_vacio(array $explode): bool|array
+    {
+        $todo_vacio = true;
+        foreach ($explode as $parte){
+            $todo_vacio = $this->parte_to_name_file(parte: $parte);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al validar parte del nombre del file', data: $todo_vacio);
+            }
+        }
+        return $todo_vacio;
+    }
+
+    /**
      * Valida los datos de un archivo para obtener una extension
-     * @param string $archivo
+     * @param string $archivo Ruta a verificar la extension
      * @return bool|array
      */
     private function valida_extension(string $archivo): bool|array
@@ -153,13 +208,10 @@ class files{
         if(count($explode) === 1){
             return $this->error->error(mensaje: 'Error el archivo no tiene extension', data: $explode);
         }
-
-        $todo_vacio = true;
-        foreach ($explode as $parte){
-            $parte = trim($parte);
-            if($parte !== ''){
-                $todo_vacio = false;
-            }
+        $todo_vacio = $this->todo_vacio(explode:$explode);
+        if(errores::$error){
+            return $this->error->error(
+                mensaje: 'Error al validar si estan vacios todos los elementos de un name file', data: $todo_vacio);
         }
         if($todo_vacio){
             return $this->error->error(mensaje: 'Error el archivo solo tiene puntos', data: $archivo);
