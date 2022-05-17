@@ -19,7 +19,7 @@ class filesTest extends test {
     public function test_es_lock_service(){
         errores::$error = false;
         $fl = new files();
-        //$fl = new liberator($fl);
+        $fl = new liberator($fl);
 
         $archivo = '';
         $resultado = $fl->es_lock_service($archivo);
@@ -119,5 +119,42 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_valida_extension()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
 
+        $archivo = '';
+        $resultado = $fl->valida_extension($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error archivo no puede venir vacio", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $archivo = 'a';
+        $resultado = $fl->valida_extension($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error el archivo no tiene extension", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $archivo = 'a.';
+        $resultado = $fl->valida_extension($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error el archivo solo tiene puntos", $resultado['mensaje']);
+        errores::$error = false;
+
+        $archivo = 'a.z';
+        $resultado = $fl->valida_extension($archivo);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertTrue($resultado);
+        errores::$error = false;
     }
+
+
+}

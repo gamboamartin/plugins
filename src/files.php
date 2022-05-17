@@ -12,11 +12,33 @@ class files{
     }
 
     /**
+     * Asigna los datos necesarios para verificar los archivos de un servicio
+     * @param string $archivo Path o nombre del archivo
+     * @return array|stdClass obj->file obj->es_lock obj->es_info
+     */
+    private function asigna_data_file_service(string $archivo): array|stdClass
+    {
+        $es_lock = $this->es_lock_service(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al verificar file',data: $es_lock);
+        }
+        $es_info = $this->es_info_service(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje:  'Error al verificar file',data: $es_info);
+        }
+        $data = new stdClass();
+        $data->file = $archivo;
+        $data->es_lock = $es_lock;
+        $data->es_info = $es_info;
+
+        return $data;
+    }
+    /**
      * Determina si el archivo es de tipo info para services
      * @param string $archivo Ruta a verificar el tipo
      * @return bool|array
      */
-    public function es_info_service(string $archivo): bool|array
+    private function es_info_service(string $archivo): bool|array
     {
         $valida = $this->valida_extension(archivo: $archivo);
         if(errores::$error){
@@ -40,7 +62,7 @@ class files{
      * @param string $archivo Path o nombre del archivo
      * @return bool|array verdadero si es lock falso si no, array error
      */
-    public function es_lock_service(string $archivo): bool|array
+    private function es_lock_service(string $archivo): bool|array
     {
         $valida = $this->valida_extension(archivo: $archivo);
         if(errores::$error){
@@ -73,6 +95,21 @@ class files{
 
         return (new SplFileInfo($archivo))->getExtension();
 
+    }
+
+    public function files_services(string $directorio): array
+    {
+        $archivos = array();
+        while ($archivo = readdir($directorio)){
+            if (!is_dir($archivo)) {
+                $data = $this->asigna_data_file_service(archivo: $archivo);
+                if(errores::$error){
+                    return $this->error->error(mensaje:  'Error al asignar file',data: $data);
+                }
+                $archivos[] = $data;
+            }
+        }
+        return $archivos;
     }
 
     /**
@@ -131,6 +168,33 @@ class files{
             return $this->error->error('Error directorio invalido',$ruta);
         }
         return $datas;
+    }
+
+    /**
+     * Determina si el archivo se mostrara o no en el index de services
+     * @param stdClass $archivo Nombre del archivo a validar
+     * @return bool
+     */
+    public function muestra_en_service(stdClass $archivo): bool
+    {
+        $muestra = true;
+        if(is_dir($archivo->file)){
+            $muestra = false;
+        }
+        if($archivo->file==='index.php'){
+            $muestra = false;
+        }
+        if($archivo->file==='init.php'){
+            $muestra = false;
+        }
+        if($archivo->es_lock){
+            $muestra = false;
+        }
+        if($archivo->es_info){
+            $muestra = false;
+        }
+
+        return $muestra;
     }
 
     /**
@@ -198,6 +262,7 @@ class files{
 
     /**
      * Valida los datos de un archivo para obtener una extension
+     * @version 1.0.0
      * @param string $archivo Ruta a verificar la extension
      * @return bool|array
      */
@@ -224,30 +289,5 @@ class files{
         return true;
     }
 
-    /**
-     * Determina si el archivo se mostrara o no en el index de services
-     * @param stdClass $archivo Nombre del archivo a validar
-     * @return bool
-     */
-    public function muestra_en_service(stdClass $archivo): bool
-    {
-        $muestra = true;
-        if(is_dir($archivo->file)){
-            $muestra = false;
-        }
-        if($archivo->file==='index.php'){
-            $muestra = false;
-        }
-        if($archivo->file==='init.php'){
-            $muestra = false;
-        }
-        if($archivo->es_lock){
-            $muestra = false;
-        }
-        if($archivo->es_info){
-            $muestra = false;
-        }
 
-        return $muestra;
-    }
 }
