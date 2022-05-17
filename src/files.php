@@ -35,6 +35,7 @@ class files{
     }
     /**
      * Determina si el archivo es de tipo info para services
+     * @version 1.0.0
      * @param string $archivo Ruta a verificar el tipo
      * @return bool|array
      */
@@ -97,7 +98,11 @@ class files{
 
     }
 
-    public function files_services(string $directorio): array
+    /**
+     * @param mixed $directorio Recurso tipo opendir
+     * @return array
+     */
+    public function files_services(mixed $directorio): array
     {
         $archivos = array();
         while ($archivo = readdir($directorio)){
@@ -109,6 +114,7 @@ class files{
                 $archivos[] = $data;
             }
         }
+        asort($archivos);
         return $archivos;
     }
 
