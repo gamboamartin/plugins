@@ -3,6 +3,7 @@ namespace gamboamartin\plugins;
 use gamboamartin\errores\errores;
 use JetBrains\PhpStorm\Pure;
 use SplFileInfo;
+use stdClass;
 
 class files{
     private errores $error;
@@ -134,10 +135,11 @@ class files{
 
     /**
      * Verifica si la parte enviada esta vacia o no
+     * @version 1.0.0
      * @param string $parte Parte de un name file
      * @return bool
      */
-    private function parte_to_name_file(string $parte): bool
+    PUBLIC function parte_to_name_file(string $parte): bool
     {
         $todo_vacio = true;
         $parte = trim($parte);
@@ -219,5 +221,28 @@ class files{
 
 
         return true;
+    }
+
+    /**
+     * Determina si el archivo se mostrara o no en el index de services
+     * @param stdClass $archivo Nombre del archivo a validar
+     * @return bool
+     */
+    public function muestra_en_service(stdClass $archivo): bool
+    {
+        $muestra = true;
+        if($archivo->file==='index.php'){
+            $muestra = false;
+        }
+        if($archivo->file==='init.php'){
+            $muestra = false;
+        }
+        if($archivo->es_lock){
+            $muestra = false;
+        }
+        if($archivo->es_info){
+            $muestra = false;
+        }
+        return $muestra;
     }
 }

@@ -1,11 +1,11 @@
 <?php
-namespace tests\src\exportador;
+namespace tests\src;
 
 use gamboamartin\errores\errores;
-use gamboamartin\plugins\exportador\datos;
 use gamboamartin\plugins\files;
+use gamboamartin\test\liberator;
 use gamboamartin\test\test;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 
 
 class filesTest extends test {
@@ -84,5 +84,27 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_parte_to_name_file()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
 
-}
+        $parte = '';
+        $resultado = $fl->parte_to_name_file($parte);
+        $this->assertIsBool($resultado);
+        $this->assertTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+        $parte = 'a';
+        $resultado = $fl->parte_to_name_file($parte);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+
+    }
+
+
+    }
