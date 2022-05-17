@@ -42,8 +42,6 @@ class files{
             return $this->error->error(mensaje:  'Error al obtener nombre del servicio',data: $name_service);
         }
 
-        $explode_name = explode('.php', $archivo);
-        $name_service = $explode_name[0];
 
         $data = new stdClass();
         $data->file = $archivo;
@@ -55,6 +53,27 @@ class files{
 
         return $data;
     }
+
+    /**
+     * Se asignan los datos de un servicio
+     * @param stdClass $archivo File de services a verificar
+     * @param array $servicio servicio en verificacion
+     * @return array
+     */
+    private function asigna_data_service(stdClass $archivo, array $servicio): array
+    {
+        if($archivo->es_service){
+            $servicio['file'] =  $archivo->file;
+        }
+        if($archivo->es_lock){
+            $servicio['file_lock'] =  $archivo->file;
+        }
+        if($archivo->es_info){
+            $servicio['file_info'] =  $archivo->file;
+        }
+        return $servicio;
+    }
+
 
     /**
      * Determina si el archivo es de tipo info para services
@@ -235,6 +254,24 @@ class files{
             return $this->error->error('Error directorio invalido',$ruta);
         }
         return $datas;
+    }
+
+    public function maqueta_files_service(array $archivos): array
+    {
+        $servicios = array();
+        foreach($archivos as $archivo){
+            if(!isset($servicios[$archivo->name_service])){
+                $servicios[$archivo->name_service] = array();
+            }
+            $servicio = $servicios[$archivo->name_service];
+            $service = $this->asigna_data_service(archivo: $archivo, servicio: $servicio);
+            if(errores::$error){
+                return $this->error->error('Error al asignar datos', $service);
+            }
+            $servicios[$archivo->name_service] = $service;
+
+        }
+        return $servicios;
     }
 
     /**

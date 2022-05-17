@@ -196,7 +196,7 @@ class filesTest extends test {
 
         $directorio = opendir('/var/www/html/plugins/src/');
         $resultado = $fl->files_services($directorio);
-        print_r($resultado);
+
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
 
