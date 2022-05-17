@@ -69,6 +69,14 @@ class files{
         if(errores::$error){
             return $this->error->error('Error al validar archivo', $valida);
         }
+
+
+        $servicio = $this->init_data_file_service(servicio: $servicio);
+        if(errores::$error){
+            return $this->error->error('Error al inicializar servicio', $servicio);
+        }
+
+
         if($archivo->es_service){
             $servicio['file'] =  $archivo->file;
         }
@@ -83,6 +91,7 @@ class files{
 
     /**
      * Se asignan los archivos de una carpeta de servicios
+     * @version 1.0.0
      * @param stdClass $archivo datos ocn ruta del servicio
      * @param array $servicios conjunto de servicios recursivos
      * @return array retorna los servicios ajustados
@@ -112,7 +121,6 @@ class files{
         $servicios[$archivo->name_service] = $service;
         return $servicios;
     }
-
 
     /**
      * Determina si el archivo es de tipo info para services
@@ -280,6 +288,20 @@ class files{
         return $ruta_file;
     }
 
+    private function init_data_file_service(array $servicio): array
+    {
+        if(!isset( $servicio['file'])){
+            $servicio['file'] = '';
+        }
+        if(!isset( $servicio['file_lock'])){
+            $servicio['file_lock'] = '';
+        }
+        if(!isset( $servicio['file_info'])){
+            $servicio['file_info'] = '';
+        }
+        return $servicio;
+    }
+
     /**
      * P ORDER P INT
      * @param string $ruta
@@ -309,10 +331,18 @@ class files{
         return $datas;
     }
 
+    /**
+     * Maqueta los archivos para dar salida a un array con los servicios a mostrar en un index
+     * @param array $archivos conjunto de datos de archivos para su maquetacion
+     * @return array
+     */
     private function maqueta_files_service(array $archivos): array
     {
         $servicios = array();
         foreach($archivos as $archivo){
+            if(!is_object($archivo)){
+                return $this->error->error('Error el archivo debe ser un stdclass', $archivo);
+            }
             $servicios = $this->asigna_servicios(archivo: $archivo,servicios: $servicios);
             if(errores::$error){
                 return $this->error->error('Error al asignar datos servicios', $servicios);

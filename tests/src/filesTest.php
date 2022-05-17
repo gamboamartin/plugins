@@ -240,6 +240,36 @@ class filesTest extends test {
 
     }
 
+    public function test_maqueta_files_services()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivos = array();
+
+        $resultado = $fl->maqueta_files_service($archivos);
+        $this->assertIsArray($resultado);
+        $this->assertEmpty($resultado);
+        $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+
+        $archivos = array();
+        $archivos[0] = new stdClass();
+        $archivos[0]->name_service = 'a';
+        $archivos[0]->es_service = true;
+        $archivos[0]->es_lock = true;
+        $archivos[0]->es_info = true;
+        $archivos[0]->file = 'z';
+
+        $resultado = $fl->maqueta_files_service($archivos);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+    }
+
     public function test_parte_to_name_file()
     {
         errores::$error = false;
