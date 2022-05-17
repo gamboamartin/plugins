@@ -16,6 +16,31 @@ class filesTest extends test {
         $this->errores = new errores();
     }
 
+    public function test_asigna_data_file_service()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivo = '';
+        $resultado = $fl->asigna_data_file_service($archivo);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error al validar extension", $resultado['mensaje']);
+
+        errores::$error = false;
+
+
+        $archivo = 'a.info';
+        $resultado = $fl->asigna_data_file_service($archivo);
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("a.info", $resultado->file);
+
+        errores::$error = false;
+
+    }
+
     public function test_es_info_service()
     {
         errores::$error = false;

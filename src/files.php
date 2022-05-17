@@ -13,11 +13,17 @@ class files{
 
     /**
      * Asigna los datos necesarios para verificar los archivos de un servicio
+     * @version 1.0.0
      * @param string $archivo Path o nombre del archivo
      * @return array|stdClass obj->file obj->es_lock obj->es_info obj->es_service
      */
     private function asigna_data_file_service(string $archivo): array|stdClass
     {
+        $valida = $this->valida_extension(archivo: $archivo);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar extension', data: $valida);
+        }
+
         $es_lock = $this->es_lock_service(archivo: $archivo);
         if(errores::$error){
             return $this->error->error(mensaje:  'Error al verificar file',data: $es_lock);
@@ -30,11 +36,13 @@ class files{
         if(errores::$error){
             return $this->error->error(mensaje:  'Error al verificar file',data: $es_service);
         }
+
         $data = new stdClass();
         $data->file = $archivo;
         $data->es_lock = $es_lock;
         $data->es_info = $es_info;
         $data->es_service = $es_service;
+
 
         return $data;
     }
@@ -88,6 +96,7 @@ class files{
 
     /**
      * Determina si un file es un service para ejecucion de servicios
+     * @version 1.0.0
      * @param string $archivo Ruta a verificar el tipo
      * @return bool|array
      */
@@ -135,6 +144,9 @@ class files{
         $archivos = array();
         while ($archivo = readdir($directorio)){
             if (!is_dir($archivo)) {
+                if($archivo === 'index.php' || $archivo === 'init.php'){
+                    continue;
+                }
                 $data = $this->asigna_data_file_service(archivo: $archivo);
                 if(errores::$error){
                     return $this->error->error(mensaje:  'Error al asignar file',data: $data);
