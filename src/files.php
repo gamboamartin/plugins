@@ -60,7 +60,7 @@ class files{
      * @version 1.0.0
      * @param stdClass $archivo File de services a verificar
      * @param array $servicio servicio en verificacion
-     * @return array
+     * @return array $servicio[file,file_lock,file_info]
      */
     private function asigna_data_service(stdClass $archivo, array $servicio): array
     {
@@ -94,7 +94,8 @@ class files{
      * @version 1.0.0
      * @param stdClass $archivo datos ocn ruta del servicio
      * @param array $servicios conjunto de servicios recursivos
-     * @return array retorna los servicios ajustados
+     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info] pueden ser
+     * varios
      */
     private function asigna_servicios(stdClass $archivo, array $servicios): array
     {
@@ -245,6 +246,11 @@ class files{
         return $archivos;
     }
 
+    /**
+     * @param mixed $directorio Recurso tipo opendir
+     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info]
+     * pueden ser varios
+     */
     public function get_files_services(mixed $directorio): array
     {
         $archivos = $this->files_services(directorio: $directorio);
@@ -252,7 +258,7 @@ class files{
             return $this->error->error(mensaje:  'Error al asignar files',data: $archivos);
         }
 
-        $servicios = $this->maqueta_files_service($archivos);
+        $servicios = $this->maqueta_files_service(archivos: $archivos);
         if(errores::$error){
             return $this->error->error(mensaje:  'Error al maquetar files',data: $servicios);
         }
@@ -288,6 +294,11 @@ class files{
         return $ruta_file;
     }
 
+    /**
+     * Si los keys de file, file_lock y file_info no existen los inicializa como vacios
+     * @param array $servicio servicio en verificacion puede estar vacio
+     * @return array $servicio[file,file_lock,file_info] todos vacios si no existen
+     */
     private function init_data_file_service(array $servicio): array
     {
         if(!isset( $servicio['file'])){
@@ -335,7 +346,7 @@ class files{
      * Maqueta los archivos para dar salida a un array con los servicios a mostrar en un index
      * @version 1.0.0
      * @param array $archivos conjunto de datos de archivos para su maquetacion
-     * @return array
+     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info] pueden ser varios
      */
     private function maqueta_files_service(array $archivos): array
     {
