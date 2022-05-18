@@ -384,5 +384,42 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_valida_folder(){
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $ruta = '';
+        $resultado = $fl->valida_folder($ruta);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error la ruta esta vacio", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $ruta = 'zzz';
+        $resultado = $fl->valida_folder($ruta);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error la ruta no existe o no es una carpeta", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $ruta = '/var/www/html/plugins/tests/services/service1.php';
+        $resultado = $fl->valida_folder($ruta);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase("Error la ruta no existe o no es una carpeta", $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $ruta = '/var/www/html/plugins/tests/services/';
+        $resultado = $fl->valida_folder($ruta);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertTrue($resultado);
+        errores::$error = false;
+    }
+
 
 }

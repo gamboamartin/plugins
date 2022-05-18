@@ -12,6 +12,29 @@ class files{
         $this->error = new errores();
     }
 
+    private function asigna_archivos(mixed $directorio): array
+    {
+        $archivos = array();
+        while ($archivo = readdir($directorio)){
+            $data = $this->asigna_data_file(ruta: $archivo);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error al asignar datos', data: $data);
+            }
+            $archivos[] = $data;
+        }
+        return $archivos;
+    }
+    private function asigna_data_file(string $ruta): stdClass
+    {
+        $data = new stdClass();
+        $data->es_directorio = false;
+        if(is_dir($ruta)){
+            $data->es_directorio = true;
+        }
+        $data->name_file = $ruta;
+
+        return $data;
+    }
     /**
      * Asigna los datos necesarios para verificar los archivos de un servicio
      * @version 1.0.0
@@ -213,17 +236,11 @@ class files{
         if(!$directorio){
             return $this->error->error(mensaje: 'Error al abrir ruta', data: $ruta);
         }
-        $archivos = array();
-        while ($archivo = readdir($directorio)){
-            $data = new stdClass();
-            $data->es_directorio = false;
-            if(is_dir($archivo)){
-                $data->es_directorio = true;
-            }
-            $data->name_file = $archivo;
-
-            $archivos[] = $data;
+        $archivos = $this->asigna_archivos(directorio: $directorio);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al asignar archivos', data: $archivos);
         }
+
         return $archivos;
 
     }
@@ -576,6 +593,12 @@ class files{
         return true;
     }
 
+    /**
+     * Verifica que la ruta sea un folder
+     * @version 1.0.0
+     * @param string $ruta Ruta a verificar
+     * @return bool|array true si es correcto
+     */
     private function valida_folder(string $ruta): bool|array
     {
         $ruta = trim($ruta);
