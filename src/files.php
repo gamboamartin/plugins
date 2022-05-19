@@ -570,7 +570,7 @@ class files{
      * @param string $archivo Ruta a verificar la extension
      * @return bool|array
      */
-    private function valida_extension(string $archivo): bool|array
+    public function valida_extension(string $archivo): bool|array
     {
         $archivo = trim($archivo);
         if($archivo === ''){
