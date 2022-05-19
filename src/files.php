@@ -491,6 +491,16 @@ class files{
         return $explode_name[0];
     }
 
+    public function nombre_doc(int $tipo_documento_id, string $extension): string
+    {
+        $nombre = $tipo_documento_id .'.';
+        for ($i = 0; $i < 6; $i++){
+            $nombre.= rand(10,99);
+        }
+
+        return $nombre.".".$extension;
+    }
+
     /**
      * Verifica si la parte enviada esta vacia o no
      * @version 1.0.0
