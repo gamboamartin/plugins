@@ -282,6 +282,40 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_guarda_archivo_fisico()
+    {
+        errores::$error = false;
+        $fl = new files();
+        //$fl = new liberator($fl);
+
+        $contenido_file = '';
+        $ruta_file = '';
+        $resultado = $fl->guarda_archivo_fisico($contenido_file, $ruta_file);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase('Error $ruta_file esta vacia', $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $contenido_file = '';
+        $ruta_file = 'zzz';
+        $resultado = $fl->guarda_archivo_fisico($contenido_file, $ruta_file);
+        $this->assertIsArray($resultado);
+        $this->assertTrue(errores::$error);
+        $this->assertStringContainsStringIgnoringCase('Error $contenido_file esta vacio', $resultado['mensaje']);
+
+        errores::$error = false;
+
+        $contenido_file = 'x';
+        $ruta_file = 'zzz';
+        $resultado = $fl->guarda_archivo_fisico($contenido_file, $ruta_file);
+        $this->assertIsString($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals('zzz', $resultado);
+        unlink('zzz');
+        errores::$error = false;
+    }
+
     public function test_maqueta_files_services()
     {
         errores::$error = false;
