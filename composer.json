@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "gamboa.martin/errores": "main-dev",
+        "gamboa.martin/errores": "^1.0.0",
         "gamboa.martin/test": "main-dev",
         "gamboa.martin/validacion": "main-dev",
         "php": " >=8.1",
