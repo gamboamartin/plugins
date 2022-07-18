@@ -205,6 +205,7 @@ class filesTest extends test {
         errores::$error = false;
         $ruta = '/var/www/html/plugins/tests/services';
         $resultado = $fl->estructura($ruta);
+        //print_r($resultado);exit;
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
         $this->assertEquals("service1.php.lock", $resultado[4]->name_file);
@@ -265,6 +266,23 @@ class filesTest extends test {
 
         errores::$error = false;
 
+    }
+
+    public function test_get_files_services()
+    {
+        errores::$error = false;
+        $fl = new files();
+        //$fl = new liberator($fl);
+
+        //$directorio = '/var/www/html/plugins/tests/services';
+        $directorio = opendir('/var/www/html/plugins/tests/services');
+        $resultado = $fl->get_files_services($directorio);
+        //print_r($resultado);exit;
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals('service1.php',$resultado['service1']['file']);
+
+        errores::$error = false;
     }
 
     public function test_get_data_service()

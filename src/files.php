@@ -343,11 +343,16 @@ class files{
 
     /**
      * @param mixed $directorio Recurso tipo opendir
+     * @version 0.2.0 Se integra UT para monitor de servicios
      * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info]
      * pueden ser varios
      */
     public function get_files_services(mixed $directorio): array
     {
+        if(is_string($directorio)){
+            return $this->error->error(mensaje:  'Error el directorio no puede ser un string',data: $directorio);
+        }
+
         $archivos = $this->files_services(directorio: $directorio);
         if(errores::$error){
             return $this->error->error(mensaje:  'Error al asignar files',data: $archivos);
