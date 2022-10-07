@@ -42,7 +42,7 @@ class estilos{
      */
     public function asigna_estilos_titulo(array $estilo_titulos, Spreadsheet $libro): array{
         try {
-            $libro->getActiveSheet()->getStyle('A1:Z1')->applyFromArray($estilo_titulos);
+            $libro->getActiveSheet()->getStyle('A1:ZZ')->applyFromArray($estilo_titulos);
         }
         catch (Throwable $e){
             return $this->error->error('Error al aplicar autosize',$e);
