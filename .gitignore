@@ -60,5 +60,7 @@ composer.lock
 
 /vendor/
 /config/database.php
+/config/generales.php
+/config/views.php
 /config/default/regex.json
 

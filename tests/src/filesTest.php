@@ -205,10 +205,10 @@ class filesTest extends test {
         errores::$error = false;
         $ruta = '/var/www/html/plugins/tests/services';
         $resultado = $fl->estructura($ruta);
-        //print_r($resultado);exit;
+
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
-        $this->assertEquals("service1.php.lock", $resultado[4]->name_file);
+        $this->assertEquals("service1.php.lock", $resultado[0]->name_file);
         errores::$error = false;
     }
 
