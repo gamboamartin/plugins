@@ -385,6 +385,35 @@ class filesTest extends test {
         errores::$error = false;
 
     }
+
+    public function test_rmdir_recursive(){
+        errores::$error = false;
+        $fl = new files();
+        //$fl = new liberator($fl);
+
+        $dir = '/var/www/html/plugins/tests/del/';
+        if(!file_exists($dir)) {
+            mkdir($dir);
+        }
+
+        $dir1 = '/var/www/html/plugins/tests/del/1';
+        if(!file_exists($dir1)) {
+            mkdir($dir1);
+        }
+
+
+        $dir2 = '/var/www/html/plugins/tests/del/1/2';
+        if(!file_exists($dir2)) {
+            mkdir($dir2);
+        }
+
+        $resultado = $fl->rmdir_recursive(dir:$dir,mismo: true);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertFileDoesNotExist($dir);
+        errores::$error = false;
+    }
+
     public function test_todo_vacio()
     {
         errores::$error = false;
