@@ -533,6 +533,7 @@ class files{
      * @param array $data datos previos
      * @param bool $mismo si mismo elimina la ruta en dir
      * @return array|mixed
+     * @version 0.7.0
      */
     public function rmdir_recursive(string $dir, array $data = array(), bool $mismo = false): mixed
     {
