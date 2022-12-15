@@ -18,8 +18,8 @@
     ],
     "require": {
         "gamboa.martin/errores": "^1.0.0",
-        "gamboa.martin/test": "main-dev",
-        "gamboa.martin/validacion": "main-dev",
+        "gamboa.martin/test": "^1.0.0",
+        "gamboa.martin/validacion": "^1.0.0",
         "php": " >=8.1",
         "phpoffice/phpspreadsheet": "^1.16",
         "phpunit/phpunit": "^9.5"
