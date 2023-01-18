@@ -18,7 +18,7 @@ class datos{
      * @param string $dato
      * @return array|Spreadsheet
      */
-    public function genera_datos_libro(string $dato, Spreadsheet $libro):array|Spreadsheet{ //FIN PROT
+    final public function genera_datos_libro(string $dato, Spreadsheet $libro):array|Spreadsheet{ //FIN PROT
         if(trim($dato) === ''){
             return $this->error->error('Error el dato esta vacio',$dato);
         }
