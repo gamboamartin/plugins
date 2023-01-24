@@ -20,8 +20,9 @@ class exportador{
     public array $estilos;
     public Spreadsheet $libro;
     public errores $error;
+    private int $num_hojas;
 
-    public function __construct(){
+    public function __construct(int $num_hojas = 1){
         $this->libro =  new Spreadsheet();
 
         $letras = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S',
@@ -61,6 +62,231 @@ class exportador{
         $this->estilos['fecha'] = 'yyyy-mm-dd';
         $this->estilos['moneda'] = '[$$-80A]#,##0.00;[RED]-[$$-80A]#,##0.00';
 
+        if ($num_hojas < 1) {
+            $error = $this->error->error('Error $num_hojas no puede ser menor a 1', $num_hojas);
+            print_r($error);
+            die('Error');
+        }
+
+        $this->num_hojas = $num_hojas;
+
+    }
+
+    public function genera_xls(bool  $header, string $name, array $nombre_hojas, array $keys_hojas, string $path_base,
+                               array $size_columnas = array(), array $centers = array(), array $moneda = array(),
+                               array $moneda_sin_decimal = array()): array|string
+    {
+        if(trim($name) === ''){
+            $error = $this->error->error('Error al $name no puede venir vacio', $name);
+            if(!$header){
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        if (empty($nombre_hojas)) {
+            $error = $this->error->error('Error nombre_hojas no puede venir vacio', $nombre_hojas);
+            if (!$header) {
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        if (sizeof($nombre_hojas) !== $this->num_hojas) {
+            $error = $this->error->error('Error tiene que existir la misma cantidad de nombres de hojas que 
+            el total de $num_hojas declaradas', $nombre_hojas);
+            if (!$header) {
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        foreach ($nombre_hojas as $nombre_hoja) {
+            if (trim($nombre_hoja) === '') {
+                $error = $this->error->error('Error $nombre_hoja no puede venir vacio', $nombre_hoja);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            if (!is_string($nombre_hoja)) {
+                $error = $this->error->error('Error $nombre_hoja tiene que ser una cadena de texto', $nombre_hoja);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+        }
+
+        $libro = new Spreadsheet();
+        $libro->createSheet();
+
+        foreach ($nombre_hojas as $index => $nombre_hoja) {
+
+            if (!array_key_exists($nombre_hoja, $keys_hojas)) {
+                $error = $this->error->error("Error ($nombre_hoja) no es un objeto", $keys_hojas);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            if (!property_exists($keys_hojas[$nombre_hoja], "keys")) {
+                $error = $this->error->error("Error ($nombre_hoja) no tiene asignado la propiedad keys", $keys_hojas);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            if (!property_exists($keys_hojas[$nombre_hoja], "registros")) {
+                $error = $this->error->error("Error ($nombre_hoja) no tiene asignado la propiedad registros", $keys_hojas);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            if (!is_array($keys_hojas[$nombre_hoja]->keys)) {
+                $error = $this->error->error("Error la propiedad keys de ($nombre_hoja) no es un array", $keys_hojas);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            if (!is_array($keys_hojas[$nombre_hoja]->registros)) {
+                $error = $this->error->error("Error la propiedad registros de ($nombre_hoja) no es un array", $keys_hojas);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+
+
+            $libro = (new datos())->genera_datos_libro(dato: $nombre_hoja, libro: $libro);
+            if (errores::$error) {
+                $error = $this->error->error('Error al generar datos del libro', $libro);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            $genera_encabezados = (new datos())->genera_encabezados(columnas: $this->columnas, index: $index,
+                keys: $keys_hojas[$nombre_hoja]->keys, libro: $libro);
+            if (errores::$error) {
+                $error = $this->error->error('Error al generar $genera_encabezados', $genera_encabezados);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            $llenado = (new datos())->llena_libro_xls(columnas: $this->columnas, estilo_contenido: $this->estilo_contenido,
+                estilos: $this->estilos, index: $index, keys: $keys_hojas[$nombre_hoja]->keys, libro: $libro, path_base: $path_base,
+                registros: $keys_hojas[$nombre_hoja]->registros, totales: array());
+            if (errores::$error) {
+                $error = $this->error->error('Error al generar $llenado', $llenado);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            $estilos_titulo = (new estilos())->asigna_estilos_titulo(estilo_titulos: $this->estilo_titulos, libro: $libro);
+            if (isset($estilos_titulo['error'])) {
+                $error = $this->error->error('Error al aplicar $estilos_titulo', $estilos_titulo);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            $autosize = (new estilos())->aplica_autosize(columnas: $this->columnas, keys: $keys_hojas[$nombre_hoja]->keys,
+                libro: $libro);
+            if (errores::$error) {
+                $error = $this->error->error('Error en autosize', $autosize);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+            foreach ($size_columnas as $columna => $size_column) {
+                $libro->getActiveSheet()->getColumnDimension($columna)->setAutoSize(false);
+                $libro->getActiveSheet()->getColumnDimension($columna)->setWidth($size_column);
+            }
+
+            foreach ($centers as $center) {
+                $style = array(
+                    'alignment' => array(
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    )
+                );
+
+                $count = count($keys_hojas[$nombre_hoja]->registros) + 1;
+                $libro->getActiveSheet()->getStyle($center . '1:' . $center . $count)->applyFromArray($style);
+            }
+
+            foreach ($moneda_sin_decimal as $column) {
+                $count = count($keys_hojas[$nombre_hoja]->registros) + 1;
+                $libro->getActiveSheet()->getStyle(
+                    $column . '1:' . $column . $count)->getNumberFormat()->setFormatCode("$#,00");
+            }
+
+            foreach ($moneda as $column) {
+                $count = count($keys_hojas[$nombre_hoja]->registros) + 1;
+                $libro->getActiveSheet()->getStyle(
+                    $column . '1:' . $column . $count)->getNumberFormat()->setFormatCode(
+                    NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            }
+
+            try {
+                $libro->getActiveSheet()->setTitle(substr($nombre_hoja, 0, 31));
+                $libro->setActiveSheetIndex($index);
+            } catch (Throwable $e) {
+                $error = $this->error->error('Error al aplicar generar datos del libro', $e);
+                if (!$header) {
+                    return $error;
+                }
+                print_r($error);
+                die('Error');
+            }
+
+        }
+
+        $data = (new output())->genera_salida_xls(header: $header, libro: $libro, name: $name, path_base: $path_base);
+        if (isset($data['error'])) {
+            $error = $this->error->error('Error al aplicar generar salida', $data);
+            if (!$header) {
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        if (!$header) {
+            return $data;
+        }
+        exit;
     }
 
 
