@@ -125,9 +125,12 @@ class exportador{
         }
 
         $libro = new Spreadsheet();
-        $libro->createSheet();
 
         foreach ($nombre_hojas as $index => $nombre_hoja) {
+
+            if ($index < $this->num_hojas -1){
+                $libro->createSheet();
+            }
 
             if (!array_key_exists($nombre_hoja, $keys_hojas)) {
                 $error = $this->error->error("Error ($nombre_hoja) no es un objeto", $keys_hojas);
