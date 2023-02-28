@@ -11,7 +11,7 @@ use stdClass;
 class Importador
 {
     public errores $error;
-    private static Importador $instance;
+    private static $instance;
 
     private function __construct()
     {
