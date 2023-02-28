@@ -46,11 +46,38 @@ class datos{
      * @param Spreadsheet $libro
      * @return array|bool
      */
-    public function genera_encabezados(array $columnas, int $index, array $keys,Spreadsheet $libro ): array|bool
+    public function genera_encabezados(array $columnas, int $index, array $keys, Spreadsheet $libro, array $keys_sum = array()): array|bool
     {
+        if (!empty($keys_sum)){
+            $fila = 2;
+            $i = 0; //columna
+            foreach ($keys_sum as $key){
+
+                $key = trim($key);
+                if($key === ''){
+                    return $this->error->error('Error key esta vacio', $key);
+                }
+                if(!isset($columnas[$i])){
+                    return $this->error->error("Error no existe columnas[$i]", $columnas);
+                }
+                if(trim($columnas[$i]) === ''){
+                    return $this->error->error("Error esta vacia la coordenada columnas[$i]", $columnas);
+                }
+                try {
+                    $libro->setActiveSheetIndex($index)->setCellValue($columnas[$i] . $fila, $key);
+                    $fila++;
+                }
+                catch (Throwable $e){
+                    return $this->error->error('Error al aplicar key en xls', $e);
+                }
+            }
+        }
+
         $fila = 1;
-        $i = 0;
+        $i = 3; //columna
+
         foreach($keys as $key){
+
             $key = trim($key);
             if($key === ''){
                 return $this->error->error('Error key esta vacio', $key);
@@ -203,7 +230,7 @@ class datos{
     private function llena_registro_xls(array $columnas, array $estilo_contenido, array $estilos, int $fila,
                                         int $index, array $keys, Spreadsheet$libro, string $path_base,
                                         array $registro):array{
-        $i=0;
+        $i=3;
         $data=array();
         foreach($keys as $campo){
             $llenado = $this->llena_datos_xls(campo: $campo, columnas: $columnas,estilo_contenido: $estilo_contenido,

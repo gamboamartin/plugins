@@ -309,10 +309,10 @@ class exportador{
      * @return array|string
      * @throws JsonException
      */
-    public function listado_base_xls( bool $header, string $name, array $keys, string $path_base, array $registros,
-                                      array  $totales, array $centers = array(), int $index = 0,
-                                      array $moneda = array(), array $moneda_sin_decimal = array(),
-                                      array $size_columnas= array()): array|string
+    public function listado_base_xls(  bool $header, string $name, array $keys, string $path_base,
+                                       array $registros, array  $totales, array $centers = array(),
+                                       int $index = 0, array $keys_sum = array(), array $moneda = array(),
+                                       array $moneda_sin_decimal = array(), array $size_columnas= array()): array|string
     {
 
         if(trim($name) === ''){
@@ -335,7 +335,7 @@ class exportador{
         }
 
         $genera_encabezados = (new datos())->genera_encabezados(columnas: $this->columnas, index: $index,
-            keys: $keys,libro: $libro);
+            keys: $keys, libro: $libro, keys_sum: $keys_sum);
         if(errores::$error){
             $error = $this->error->error('Error al generar $genera_encabezados',$genera_encabezados);
             if(!$header){
