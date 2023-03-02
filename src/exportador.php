@@ -439,4 +439,94 @@ class exportador{
         exit;
     }
 
+    function exportar_template_1(bool $header, string $path_base, string $name, array $data)
+    {
+        $spreadsheet = new Spreadsheet();
+
+        foreach ($data as $sheetName => $tables) {
+            $sheet = $spreadsheet->createSheet();
+            $sheet->setTitle($sheetName);
+
+            foreach ($tables as $table) {
+                $startRow = $table['startRow'] ?? 1;
+                $startColumn = $table['startColumn'] ?? 'A';
+
+                $headers = $table['headers'] ?? [];
+                $style = $table['style'] ?? [];
+                $orientation = $table['orientation'] ?? 'horizontal';
+
+                $data = $table['data'] ?? [];
+
+                if ($orientation == 'horizontal') {
+                    $currentRow = $startRow;
+                    foreach ($data as $row) {
+                        $currentColumn = $startColumn;
+                        foreach ($row as $cellValue) {
+                            $cell = $sheet->getCell($currentColumn . $currentRow);
+                            $cell->setValue($cellValue);
+                            $currentColumn++;
+                        }
+                        $currentRow++;
+                    }
+
+                    if (!empty($headers)) {
+                        $currentColumn = $startColumn;
+                        foreach ($headers as $headerValue) {
+                            $cell = $sheet->getCell($currentColumn . $startRow);
+                            $cell->setValue($headerValue);
+                            $currentColumn++;
+                        }
+                        $startRow++;
+                    }
+                } elseif ($orientation == 'vertical') {
+                    $currentColumn = $startColumn;
+                    foreach ($data as $row) {
+                        $currentRow = $startRow;
+                        foreach ($row as $cellValue) {
+                            $cell = $sheet->getCell($currentColumn . $currentRow);
+                            $cell->setValue($cellValue);
+                            $currentRow++;
+                        }
+                        $currentColumn++;
+                    }
+
+                    if (!empty($headers)) {
+                        $currentRow = $startRow;
+                        foreach ($headers as $headerValue) {
+                            $cell = $sheet->getCell($startColumn . $currentRow);
+                            $cell->setValue($headerValue);
+                            $currentRow++;
+                        }
+                        $startColumn++;
+                    }
+                }
+
+                // Aplicar estilos a la tabla
+                if (!empty($style)) {
+                    $lastColumn = $sheet->getHighestColumn();
+                    $lastRow = $sheet->getHighestRow();
+                    $range = $startColumn . $startRow . ':' . $lastColumn . $lastRow;
+
+                    $sheet->getStyle($range)->applyFromArray($style);
+                }
+            }
+        }
+
+        $out = (new exportador\output())->genera_salida_xls(header: $header, libro: $spreadsheet, name: $name,
+            path_base: $path_base);
+        if (isset($out['error'])) {
+            $error = $this->error->error('Error al aplicar generar salida',$data);
+            if(!$header){
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        if (!$header) {
+            return $out;
+        }
+        exit;
+    }
+
 }
