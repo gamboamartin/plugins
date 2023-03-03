@@ -1,19 +1,24 @@
 <?php
+
 namespace gamboamartin\plugins;
+
 use gamboamartin\errores\errores;
 use gamboamartin\plugins\exportador\datos;
 use gamboamartin\plugins\exportador\estilos;
 use gamboamartin\plugins\exportador\output;
 use JsonException;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Throwable;
 
 /**
  * PARAMS ORDER INTERNALS
  */
-class exportador{
+class exportador
+{
     public array $columnas;
     public array $estilo_titulos;
     public array $estilo_contenido;
@@ -22,38 +27,39 @@ class exportador{
     public errores $error;
     private int $num_hojas;
 
-    public function __construct(int $num_hojas = 1){
-        $this->libro =  new Spreadsheet();
+    public function __construct(int $num_hojas = 1)
+    {
+        $this->libro = new Spreadsheet();
 
-        $letras = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S',
-            'T','U','V','W','X','Y','Z');
+        $letras = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+            'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
         $columnas = array();
-        foreach ($letras as $letra){
+        foreach ($letras as $letra) {
             $columnas[] = $letra;
         }
 
-        foreach ($letras as $letra){
-            foreach ($letras as $letra_bis){
-                $letra_integrar = $letra.$letra_bis;
+        foreach ($letras as $letra) {
+            foreach ($letras as $letra_bis) {
+                $letra_integrar = $letra . $letra_bis;
                 $columnas[] = $letra_integrar;
             }
         }
 
 
-        $this->columnas =  $columnas;
+        $this->columnas = $columnas;
 
         $this->estilo_titulos = array(
-            'font'  => array(
-                'bold'  => true,
-                'size'  => 8,
-                'name'  => 'Verdana'
+            'font' => array(
+                'bold' => true,
+                'size' => 8,
+                'name' => 'Verdana'
             ));
 
         $this->estilo_contenido = array(
-            'font'  => array(
-                'size'  => 8,
-                'name'  => 'Verdana'
+            'font' => array(
+                'size' => 8,
+                'name' => 'Verdana'
             ));
 
         $this->error = new errores();
@@ -76,9 +82,9 @@ class exportador{
                                array $size_columnas = array(), array $centers = array(), array $moneda = array(),
                                array $moneda_sin_decimal = array()): array|string
     {
-        if(trim($name) === ''){
+        if (trim($name) === '') {
             $error = $this->error->error('Error al $name no puede venir vacio', $name);
-            if(!$header){
+            if (!$header) {
                 return $error;
             }
             print_r($error);
@@ -128,7 +134,7 @@ class exportador{
 
         foreach ($nombre_hojas as $index => $nombre_hoja) {
 
-            if ($index < $this->num_hojas -1){
+            if ($index < $this->num_hojas - 1) {
                 $libro->createSheet();
             }
 
@@ -176,7 +182,6 @@ class exportador{
                 print_r($error);
                 die('Error');
             }
-
 
 
             $libro = (new datos())->genera_datos_libro(dato: $nombre_hoja, libro: $libro);
@@ -309,15 +314,15 @@ class exportador{
      * @return array|string
      * @throws JsonException
      */
-    public function listado_base_xls(  bool $header, string $name, array $keys, string $path_base,
-                                       array $registros, array  $totales, array $centers = array(),
-                                       int $index = 0, array $keys_sum = array(), array $moneda = array(),
-                                       array $moneda_sin_decimal = array(), array $size_columnas= array()): array|string
+    public function listado_base_xls(bool  $header, string $name, array $keys, string $path_base,
+                                     array $registros, array $totales, array $centers = array(),
+                                     int   $index = 0, array $keys_sum = array(), array $moneda = array(),
+                                     array $moneda_sin_decimal = array(), array $size_columnas = array()): array|string
     {
 
-        if(trim($name) === ''){
+        if (trim($name) === '') {
             $error = $this->error->error('Error al $name no puede venir vacio', $name);
-            if(!$header){
+            if (!$header) {
                 return $error;
             }
             print_r($error);
@@ -325,9 +330,9 @@ class exportador{
         }
         $libro = new Spreadsheet();
         $libro = (new datos())->genera_datos_libro(dato: $name, libro: $libro);
-        if(errores::$error){
-            $error = $this->error->error('Error al aplicar generar datos del libro',$libro);
-            if(!$header){
+        if (errores::$error) {
+            $error = $this->error->error('Error al aplicar generar datos del libro', $libro);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
@@ -336,42 +341,42 @@ class exportador{
 
         $genera_encabezados = (new datos())->genera_encabezados(columnas: $this->columnas, index: $index,
             keys: $keys, libro: $libro, keys_sum: $keys_sum);
-        if(errores::$error){
-            $error = $this->error->error('Error al generar $genera_encabezados',$genera_encabezados);
-            if(!$header){
+        if (errores::$error) {
+            $error = $this->error->error('Error al generar $genera_encabezados', $genera_encabezados);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
             die('Error');
         }
 
-        $llenado = (new datos())->llena_libro_xls(columnas:$this->columnas, estilo_contenido:$this->estilo_contenido,
-            estilos: $this->estilos, index: $index, keys: $keys,libro: $libro, path_base: $path_base,
-            registros: $registros, totales:  $totales);
+        $llenado = (new datos())->llena_libro_xls(columnas: $this->columnas, estilo_contenido: $this->estilo_contenido,
+            estilos: $this->estilos, index: $index, keys: $keys, libro: $libro, path_base: $path_base,
+            registros: $registros, totales: $totales);
 
-        if(errores::$error){
-            $error = $this->error->error('Error al generar $llenado',$llenado);
-            if(!$header){
+        if (errores::$error) {
+            $error = $this->error->error('Error al generar $llenado', $llenado);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
             die('Error');
         }
 
-        $estilos_titulo = (new estilos())->asigna_estilos_titulo(estilo_titulos:$this->estilo_titulos, libro: $libro);
-        if(isset($estilos_titulo['error'])){
-            $error = $this->error->error('Error al aplicar $estilos_titulo',$estilos_titulo);
-            if(!$header){
+        $estilos_titulo = (new estilos())->asigna_estilos_titulo(estilo_titulos: $this->estilo_titulos, libro: $libro);
+        if (isset($estilos_titulo['error'])) {
+            $error = $this->error->error('Error al aplicar $estilos_titulo', $estilos_titulo);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
             die('Error');
         }
 
-        $autosize = (new estilos())->aplica_autosize(columnas: $this->columnas, keys: $keys,libro: $libro);
-        if(errores::$error){
-            $error = $this->error->error('Error en autosize',$autosize);
-            if(!$header){
+        $autosize = (new estilos())->aplica_autosize(columnas: $this->columnas, keys: $keys, libro: $libro);
+        if (errores::$error) {
+            $error = $this->error->error('Error en autosize', $autosize);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
@@ -381,10 +386,9 @@ class exportador{
         try {
             $libro->getActiveSheet()->setTitle(substr($name, 0, 31));
             $libro->setActiveSheetIndex(0);
-        }
-        catch (Throwable $e){
+        } catch (Throwable $e) {
             $error = $this->error->error('Error al aplicar generar datos del libro', $e);
-            if(!$header){
+            if (!$header) {
                 return $error;
             }
             print_r($error);
@@ -392,49 +396,175 @@ class exportador{
         }
 
 
-        foreach ($size_columnas as $columna =>$size_column){
+        foreach ($size_columnas as $columna => $size_column) {
 
             $libro->getActiveSheet()->getColumnDimension($columna)->setAutoSize(false);
             $libro->getActiveSheet()->getColumnDimension($columna)->setWidth($size_column);
         }
 
-        foreach ($centers as $center){
+        foreach ($centers as $center) {
             $style = array(
                 'alignment' => array(
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
                 )
             );
 
-            $count = count($registros)+1;
-            $libro->getActiveSheet()->getStyle($center.'1:'.$center.$count)->applyFromArray($style);
+            $count = count($registros) + 1;
+            $libro->getActiveSheet()->getStyle($center . '1:' . $center . $count)->applyFromArray($style);
         }
 
-        foreach ($moneda_sin_decimal as $column){
-            $count = count($registros)+1;
+        foreach ($moneda_sin_decimal as $column) {
+            $count = count($registros) + 1;
             $libro->getActiveSheet()->getStyle(
-                $column.'1:'.$column.$count)->getNumberFormat()->setFormatCode("$#,00");
+                $column . '1:' . $column . $count)->getNumberFormat()->setFormatCode("$#,00");
         }
 
-        foreach ($moneda as $column){
-            $count = count($registros)+1;
+        foreach ($moneda as $column) {
+            $count = count($registros) + 1;
             $libro->getActiveSheet()->getStyle(
-                $column.'1:'.$column.$count)->getNumberFormat()->setFormatCode(
-                    NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $column . '1:' . $column . $count)->getNumberFormat()->setFormatCode(
+                NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
         }
 
 
-        $data = (new output())->genera_salida_xls(header: $header, libro: $libro,name: $name,path_base: $path_base);
-        if(isset($data['error'])){
-            $error = $this->error->error('Error al aplicar generar salida',$data);
-            if(!$header){
+        $data = (new output())->genera_salida_xls(header: $header, libro: $libro, name: $name, path_base: $path_base);
+        if (isset($data['error'])) {
+            $error = $this->error->error('Error al aplicar generar salida', $data);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
             die('Error');
         }
 
-        if(!$header){
+        if (!$header) {
             return $data;
+        }
+        exit;
+    }
+
+    public function exportar_template(bool $header, string $path_base, string $name, array $data)
+    {
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->removeSheetByIndex(0);
+
+        foreach ($data as $nombre => $hoja) {
+            $worksheet = $spreadsheet->createSheet();
+            $worksheet->setTitle($nombre);
+
+            foreach ($hoja as $table) {
+                $titulo = $table['title'] ?? "";
+                $orientacion = $table['orientation'] ?? "horizontal";
+                $headers = $table['headers'];
+                $tableData = $table['data'];
+                $startRow = $table['startRow'] ?? 1;
+                $startColumn = $table['startColumn'] ?? "A";
+
+                $punteroColumna = $startColumn;
+                $punteroFila = $startRow;
+
+                if ($orientacion === "horizontal") {
+
+                    if (!empty($titulo)) {
+                        $inicio = $startColumn . $startRow;
+                        $aux = chr(ord($startColumn) + count($tableData[0]) - 1);
+                        $fin = $aux . $startRow;
+                        $worksheet->mergeCells("$inicio:$fin");
+                        $celda = $worksheet->getCell($startColumn . $startRow);
+                        $celda->setValue($titulo);
+                        $punteroFila++;
+                    }
+
+                    foreach ($headers as $header) {
+                        $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                        $celda->setValue($header);
+                        $punteroColumna = $celda->getColumn();
+                        $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
+                        $columnIndex += 1;
+                        $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+                    }
+
+                    foreach ($tableData as $i => $rowData) {
+                        ++$punteroFila;
+                        $punteroColumna = $startColumn;
+                        $color = ($i % 2 == 0) ? 'FFFFFF' : 'DCE6FF';
+
+                        foreach ($rowData as $cellData) {
+                            $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                            $celda->setValue($cellData);
+                            $punteroColumna++;
+                            $celda->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()
+                                ->setARGB($color);
+                        }
+                    }
+
+                    $totales = $table['totales'] ?? array();
+
+                    if (count($totales) > 0) {
+                        $totales_titulo = $totales['titulo'] ?? "";
+                        $totales_valor = $totales['valor'] ?? "";
+                        $punteroColumna = $totales['columna'] ?? $startColumn;
+
+                        if (!empty($totales_titulo)) {
+                            $celda = $worksheet->getCell($punteroColumna . ++$punteroFila);
+                            $celda->setValue($totales_titulo);
+                        }
+
+                        if (!empty($totales_valor)) {
+                            $celda = $worksheet->getCell(++$punteroColumna . $punteroFila);
+                            $celda->setValue($totales_valor);
+                        }
+                    }
+                } elseif ("vertical") {
+
+                    if (!empty($titulo)) {
+                        $inicio = $startColumn . $startRow;
+                        $aux = chr(ord($startColumn) + count($tableData));
+                        $fin = $aux . $startRow;
+                        $worksheet->mergeCells("$inicio:$fin");
+                        $celda = $worksheet->getCell($startColumn . $startRow);
+                        $celda->setValue($titulo);
+                        $punteroFila++;
+                    }
+
+                    foreach ($headers as $header) {
+                        $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                        $celda->setValue($header);
+                        $punteroFila++;
+                    }
+
+                    foreach ($tableData as $i => $rowData) {
+                        ++$punteroColumna;
+                        $color = ($i % 2 == 0) ? 'FFFFFF' : 'DCE6FF';
+
+                        $punteroFila = !empty($titulo) ? $startRow + 1 : $startRow;
+
+                        foreach ($rowData as $cellData) {
+                            $celda = $worksheet->getCell($punteroColumna . $punteroFila++);
+                            $celda->setValue($cellData);
+                            $celda->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()
+                                ->setARGB($color);
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+        $out = (new exportador\output())->genera_salida_xls(header: $header, libro: $spreadsheet, name: $name,
+            path_base: $path_base);
+        if (isset($out['error'])) {
+            $error = $this->error->error('Error al aplicar generar salida', $data);
+            if (!$header) {
+                return $error;
+            }
+            print_r($error);
+            die('Error');
+        }
+
+        if (!$header) {
+            return $out;
         }
         exit;
     }
@@ -515,8 +645,8 @@ class exportador{
         $out = (new exportador\output())->genera_salida_xls(header: $header, libro: $spreadsheet, name: $name,
             path_base: $path_base);
         if (isset($out['error'])) {
-            $error = $this->error->error('Error al aplicar generar salida',$data);
-            if(!$header){
+            $error = $this->error->error('Error al aplicar generar salida', $data);
+            if (!$header) {
                 return $error;
             }
             print_r($error);
