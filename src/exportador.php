@@ -443,7 +443,7 @@ class exportador
         exit;
     }
 
-    public function exportar_template(bool $header, string $path_base, string $name, array $data)
+    public function exportar_template(bool $header, string $path_base, string $name, array $data, array $styles = array())
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->removeSheetByIndex(0);
@@ -548,6 +548,16 @@ class exportador
                     }
                 }
 
+            }
+
+            $ultima_olumna = $worksheet->getHighestColumn();
+
+            for ($col = 'A'; $col <= $ultima_olumna; $col++) {
+                $worksheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            foreach ($styles as $range => $style){
+                $worksheet->getStyle($range)->applyFromArray($style);
             }
         }
 
