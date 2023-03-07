@@ -453,6 +453,7 @@ class exportador
             $worksheet->setTitle($nombre);
 
             foreach ($hoja as $table) {
+                $detalles = $table['detalles'] ?? array();
                 $titulo = $table['title'] ?? "";
                 $orientacion = $table['orientation'] ?? "horizontal";
                 $headers = $table['headers'];
@@ -460,8 +461,44 @@ class exportador
                 $startRow = $table['startRow'] ?? 1;
                 $startColumn = $table['startColumn'] ?? "A";
 
+                $startRow -= count($detalles);
+
                 $punteroColumna = $startColumn;
                 $punteroFila = $startRow;
+
+                if (count($detalles) > 0) {
+                    foreach ($detalles as $index => $detalle) {
+
+                        if (!array_key_exists("titulo", $detalle)) {
+                            $error = $this->error->error('Error no existe la key titulo para los detalles', $detalle);
+                            if (!$header) {
+                                return $error;
+                            }
+                            print_r($error);
+                            die('Error');
+                        }
+
+                        if (!array_key_exists("valor", $detalle)) {
+                            $error = $this->error->error('Error no existe la key valor para los detalles', $detalle);
+                            if (!$header) {
+                                return $error;
+                            }
+                            print_r($error);
+                            die('Error');
+                        }
+
+                        $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                        $celda->setValue($detalle["titulo"]);
+
+                        $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
+                        $columnIndex += 1;
+                        $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+                        $celda = $worksheet->getCell($punteroColumna . $punteroFila++);
+                        $celda->setValue($detalle["valor"]);
+                        $punteroColumna = $startColumn;
+                    }
+                    $startRow = $punteroFila;
+                }
 
                 if ($orientacion === "horizontal") {
 
@@ -547,7 +584,6 @@ class exportador
                         }
                     }
                 }
-
             }
 
             $ultima_olumna = $worksheet->getHighestColumn();
@@ -556,11 +592,10 @@ class exportador
                 $worksheet->getColumnDimension($col)->setAutoSize(true);
             }
 
-            foreach ($styles as $range => $style){
+            foreach ($styles as $range => $style) {
                 $worksheet->getStyle($range)->applyFromArray($style);
             }
         }
-
 
         $out = (new exportador\output())->genera_salida_xls(header: $header, libro: $spreadsheet, name: $name,
             path_base: $path_base);
