@@ -460,6 +460,7 @@ class exportador
                 $tableData = $table['data'];
                 $startRow = $table['startRow'] ?? 1;
                 $startColumn = $table['startColumn'] ?? "A";
+                $totales = $table['totales'] ?? array();
 
                 $startRow -= count($detalles);
 
@@ -534,24 +535,6 @@ class exportador
                                 ->setARGB($color);
                         }
                     }
-
-                    $totales = $table['totales'] ?? array();
-
-                    if (count($totales) > 0) {
-                        $totales_titulo = $totales['titulo'] ?? "";
-                        $totales_valor = $totales['valor'] ?? "";
-                        $punteroColumna = $totales['columna'] ?? $startColumn;
-
-                        if (!empty($totales_titulo)) {
-                            $celda = $worksheet->getCell($punteroColumna . ++$punteroFila);
-                            $celda->setValue($totales_titulo);
-                        }
-
-                        if (!empty($totales_valor)) {
-                            $celda = $worksheet->getCell(++$punteroColumna . $punteroFila);
-                            $celda->setValue($totales_valor);
-                        }
-                    }
                 } elseif ("vertical") {
 
                     if (!empty($titulo)) {
@@ -583,6 +566,39 @@ class exportador
                                 ->setARGB($color);
                         }
                     }
+                }
+            }
+
+            if (count($totales) > 0) {
+
+                $punteroFila++;
+
+                foreach ($totales as $index => $total){
+                    if (!array_key_exists('columna', $total)){
+                        $error = $this->error->error('Error no existe la key columna para totales', $total);
+                        if (!$header) {
+                            return $error;
+                        }
+                        print_r($error);
+                        die('Error');
+                    }
+
+                    if (!array_key_exists('valor', $total)){
+                        $error = $this->error->error('Error no existe la key valor para totales', $total);
+                        if (!$header) {
+                            return $error;
+                        }
+                        print_r($error);
+                        die('Error');
+                    }
+                    $punteroColumna = $total['columna'] ?? $startColumn;
+                    $valor = $total['valor'] ?? "";
+
+                    $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                    $celda->setValue($valor);
+                    $celda->getStyle($punteroColumna . $punteroFila)->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setRGB('BFBFBF');
                 }
             }
 
