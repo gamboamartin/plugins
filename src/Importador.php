@@ -59,7 +59,7 @@ class Importador
                 $columna = $columnas[$j];
                 $registros->$columna = $rows[$i][$j];
 
-                if (in_array($columna, $fechas)) {
+                if (in_array($columna, $fechas) && !empty($registros->$columna)) {
                     $registros->$columna = Date::excelToDateTimeObject($registros->$columna)->format('Y-m-d');;
                 }
             }
