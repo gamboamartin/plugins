@@ -60,7 +60,15 @@ class Importador
                 $registros->$columna = $rows[$i][$j];
 
                 if (in_array($columna, $fechas) && !empty($registros->$columna)) {
-                    $registros->$columna = Date::excelToDateTimeObject($registros->$columna)->format('Y-m-d');;
+                    if (strtotime($registros->$columna)) {
+                        $registros->$columna = Date::PHPToExcel($registros->$columna);
+                    }
+
+                    if (!is_numeric($registros->$columna)) {
+                        return $this->error->error('Error: la fecha no tiene el formato correcto', $registros->$columna);
+                    }
+
+                    $registros->$columna = Date::excelToDateTimeObject($registros->$columna)->format('Y-m-d');
                 }
             }
             $salida[] = $registros;
