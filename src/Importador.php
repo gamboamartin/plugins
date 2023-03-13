@@ -57,7 +57,7 @@ class Importador
                 }
 
                 $columna = $columnas[$j];
-                $registros->$columna = $rows[$i][$j];
+                $registros->$columna = !is_null($rows[$i][$j])? str_replace("'", "", $rows[$i][$j]) : $rows[$i][$j];
 
                 if (in_array($columna, $fechas) && !empty($registros->$columna)) {
                     if (strtotime($registros->$columna)) {
