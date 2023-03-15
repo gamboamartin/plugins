@@ -603,9 +603,12 @@ class exportador
             }
 
             $ultima_olumna = $worksheet->getHighestColumn();
+            $ultima_olumna = ++$ultima_olumna;
 
-            for ($col = 'A'; $col <= $ultima_olumna; $col++) {
+            $col = 'A';
+            while ($col != $ultima_olumna){
                 $worksheet->getColumnDimension($col)->setAutoSize(true);
+                $col++;
             }
 
             foreach ($styles as $range => $style) {
