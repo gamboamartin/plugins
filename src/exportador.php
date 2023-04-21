@@ -457,6 +457,7 @@ class exportador
                 $titulo = $table['title'] ?? "";
                 $orientacion = $table['orientation'] ?? "horizontal";
                 $headers = $table['headers'];
+                $mergeheaders = $table['mergeheaders'] ?? array();
                 $tableData = $table['data'];
                 $startRow = $table['startRow'] ?? 1;
                 $startColumn = $table['startColumn'] ?? "A";
@@ -514,12 +515,27 @@ class exportador
                     }
 
                     foreach ($headers as $header) {
-                        $celda = $worksheet->getCell($punteroColumna . $punteroFila);
-                        $celda->setValue($header);
-                        $punteroColumna = $celda->getColumn();
-                        $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
-                        $columnIndex += 1;
-                        $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+                        if(isset($mergeheaders[$header])){
+                            $inicio = $punteroColumna . $punteroFila;
+                            $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
+                            $columnIndex += 1;
+                            $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+                            $fin = $punteroColumna . $punteroFila;
+                            $worksheet->mergeCells("$inicio:$fin");
+                            $celda = $worksheet->getCell($inicio);
+                            $celda->setValue($header);
+                            $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
+                            $columnIndex += 1;
+                            $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+
+                        }else {
+                            $celda = $worksheet->getCell($punteroColumna . $punteroFila);
+                            $celda->setValue($header);
+                            $punteroColumna = $celda->getColumn();
+                            $columnIndex = Coordinate::columnIndexFromString($punteroColumna);
+                            $columnIndex += 1;
+                            $punteroColumna = Coordinate::stringFromColumnIndex($columnIndex);
+                        }
                     }
 
                     foreach ($tableData as $i => $rowData) {
