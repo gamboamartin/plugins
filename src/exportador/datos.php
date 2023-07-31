@@ -156,7 +156,7 @@ class datos{
                 $libro->getActiveSheet()->getStyle($celda)->getFill()
                     ->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color_contenido);
                 $libro->getActiveSheet()->getStyle($celda)->getBorders()->getOutline()
-                    ->setBorderStyle(Border::BORDER_THICK);
+                    ->setBorderStyle(Border::BORDER_THIN);
                 if($estilo) {
                     $libro->getActiveSheet()->getStyle($celda)->getNumberFormat()->setFormatCode(
                         $estilos[$estilo]);
