@@ -50,7 +50,7 @@ class datos{
      */
     public function genera_encabezados(array $columnas, int $index, array $keys, Spreadsheet $libro,
                                        array $keys_sum = array(), string $color_contenido = 'FFFFFF',
-                                       int $inicio_fila = 1): array|bool
+                                       int $inicio_fila = 1,string $color_texto = '000000'): array|bool
     {
         if (!empty($keys_sum)){
             $fila = 2;
@@ -94,6 +94,8 @@ class datos{
             }
             try {
                 $libro->setActiveSheetIndex($index)->setCellValue($columnas[$i] . $fila, $key);
+                $libro->getActiveSheet()->getStyle($columnas[$i] . $fila)->getFont()->getColor()
+                    ->setRGB($color_texto);
                 $libro->getActiveSheet()->getStyle($columnas[$i] . $fila)->getFill()
                     ->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color_contenido);
                 $i++;
@@ -104,6 +106,7 @@ class datos{
         }
         return true;
     }
+
 
     /**
      * PARAMS ORDER INTERNALS
