@@ -4,6 +4,7 @@ use gamboamartin\errores\errores;
 use JetBrains\PhpStorm\Pure;
 use JsonException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Throwable;
 
 class datos{
@@ -116,7 +117,7 @@ class datos{
      */
     private function llena_datos_xls(string $campo, array $columnas, array $estilo_contenido, array $estilos,
                                      int $fila, int $index, Spreadsheet $libro, int $numero_columna,
-                                     string $path_base, array $registro): array
+                                     string $path_base, array $registro, string $color_contenido = 'FFFFFF'): array
     {
 
         if($numero_columna<0){
@@ -148,6 +149,8 @@ class datos{
             try {
                 $libro->setActiveSheetIndex($index)->setCellValue($celda, $valor);
                 $libro->getActiveSheet()->getStyle($celda)->applyFromArray($estilo_contenido);
+                $libro->getActiveSheet()->getStyle($celda)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()
+                    ->setARGB($color_contenido);
                 if($estilo) {
                     $libro->getActiveSheet()->getStyle($celda)->getNumberFormat()->setFormatCode(
                         $estilos[$estilo]);
@@ -175,7 +178,8 @@ class datos{
      * @throws JsonException
      */
     public function llena_libro_xls(array $columnas, array $estilo_contenido, array $estilos, int $index, array $keys,
-                                     Spreadsheet $libro, string $path_base, array $registros, array $totales ): array
+                                     Spreadsheet $libro, string $path_base, array $registros, array $totales,
+                                    string $color_contenido = 'FFFFFF' ): array
     {
         $fila = 2;
         foreach($registros as $registro) {
@@ -184,7 +188,7 @@ class datos{
             }
             $llenado = $this->llena_registro_xls(columnas:$columnas, estilo_contenido:$estilo_contenido,
                 estilos: $estilos, fila: $fila, index: $index, keys: $keys, libro: $libro, path_base: $path_base,
-                registro: $registro);
+                registro: $registro, color_contenido: $color_contenido);
 
             if(errores::$error){
                 return $this->error->error('Error al aplicar $llenado', $llenado);
@@ -229,13 +233,13 @@ class datos{
      */
     private function llena_registro_xls(array $columnas, array $estilo_contenido, array $estilos, int $fila,
                                         int $index, array $keys, Spreadsheet$libro, string $path_base,
-                                        array $registro):array{
+                                        array $registro, string $color_contenido = 'FFFFFF'):array{
         $i=0;
         $data=array();
         foreach($keys as $campo){
             $llenado = $this->llena_datos_xls(campo: $campo, columnas: $columnas,estilo_contenido: $estilo_contenido,
                 estilos: $estilos, fila: $fila, index:  $index, libro: $libro, numero_columna:$i,
-                path_base: $path_base, registro: $registro);
+                path_base: $path_base, registro: $registro, color_contenido: $color_contenido);
             if(errores::$error){
                 return $this->error->error('Error al aplicar $llenado',$llenado);
             }
