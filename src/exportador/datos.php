@@ -49,7 +49,8 @@ class datos{
      * @return array|bool
      */
     public function genera_encabezados(array $columnas, int $index, array $keys, Spreadsheet $libro,
-                                       array $keys_sum = array(), string $color_contenido = 'FFFFFF'): array|bool
+                                       array $keys_sum = array(), string $color_contenido = 'FFFFFF',
+                                       int $inicio_fila = 1): array|bool
     {
         if (!empty($keys_sum)){
             $fila = 2;
@@ -76,7 +77,7 @@ class datos{
             }
         }
 
-        $fila = 1;
+        $fila = $inicio_fila;
         $i = 0; //columna
 
         foreach($keys as $key){
@@ -185,9 +186,9 @@ class datos{
      */
     public function llena_libro_xls(array $columnas, array $estilo_contenido, array $estilos, int $index, array $keys,
                                      Spreadsheet $libro, string $path_base, array $registros, array $totales,
-                                    string $color_contenido = 'FFFFFF' ): array
+                                    string $color_contenido = 'FFFFFF', int $inicio_fila = 2 ): array
     {
-        $fila = 2;
+        $fila = $inicio_fila;
         foreach($registros as $registro) {
             if(!is_array($registro)){
                 return $this->error->error('Error registro debe ser un array',$registro);
