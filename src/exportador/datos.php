@@ -74,7 +74,7 @@ class datos{
         }
 
         $fila = 1;
-        $i = 3; //columna
+        $i = 0; //columna
 
         foreach($keys as $key){
 
@@ -230,7 +230,7 @@ class datos{
     private function llena_registro_xls(array $columnas, array $estilo_contenido, array $estilos, int $fila,
                                         int $index, array $keys, Spreadsheet$libro, string $path_base,
                                         array $registro):array{
-        $i=3;
+        $i=0;
         $data=array();
         foreach($keys as $campo){
             $llenado = $this->llena_datos_xls(campo: $campo, columnas: $columnas,estilo_contenido: $estilo_contenido,
