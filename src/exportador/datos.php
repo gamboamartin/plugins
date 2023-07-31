@@ -4,6 +4,7 @@ use gamboamartin\errores\errores;
 use JetBrains\PhpStorm\Pure;
 use JsonException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Throwable;
 
@@ -149,8 +150,10 @@ class datos{
             try {
                 $libro->setActiveSheetIndex($index)->setCellValue($celda, $valor);
                 $libro->getActiveSheet()->getStyle($celda)->applyFromArray($estilo_contenido);
-                $libro->getActiveSheet()->getStyle($celda)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()
-                    ->setARGB($color_contenido);
+                $libro->getActiveSheet()->getStyle($celda)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color_contenido);
+                $libro->getActiveSheet()->getStyle($celda)->getBorders()->getOutline()
+                    ->setBorderStyle(Border::BORDER_THICK);
                 if($estilo) {
                     $libro->getActiveSheet()->getStyle($celda)->getNumberFormat()->setFormatCode(
                         $estilos[$estilo]);
