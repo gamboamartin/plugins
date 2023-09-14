@@ -32,10 +32,11 @@ class Importador
      * @param string $ruta_absoluta // ruta del archivo a leer
      * @param array $columnas // Nombre de columnas que contiene el archivo
      * @param array $fechas // Nombre de columnas que aplican para formato fecha
+     * @param string $inicio // Donde iniciara a leer los registros
      * @return array
      * @throws JsonException
      */
-    public function leer_registros(string $ruta_absoluta, array $columnas, array $fechas = array()): array
+    public function leer_registros(string $ruta_absoluta, array $columnas, array $fechas = array(), string $inicio = 'A1'): array
     {
         $inputFileType = IOFactory::identify($ruta_absoluta);
         $reader = IOFactory::createReader($inputFileType);
@@ -44,7 +45,7 @@ class Importador
         $spreadsheet = $reader->load($ruta_absoluta);
         $sheet = $spreadsheet->getSheet(0);
         $maxCell = $sheet->getHighestRowAndColumn();
-        $rows = $sheet->rangeToArray('A1:' . $maxCell['column'] . $maxCell['row']);
+        $rows = $sheet->rangeToArray("$inicio:" . $maxCell['column'] . $maxCell['row']);
 
         $salida = array();
 
