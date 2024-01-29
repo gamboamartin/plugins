@@ -7,13 +7,14 @@ use JsonException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use stdClass;
+use Throwable;
 
 class Importador
 {
     public errores $error;
     private static $instance;
 
-    private function __construct()
+    public function __construct()
     {
         $this->error = new errores();
     }
@@ -34,18 +35,23 @@ class Importador
      * @param array $fechas // Nombre de columnas que aplican para formato fecha
      * @param string $inicio // Donde iniciara a leer los registros
      * @return array
-     * @throws JsonException
      */
-    public function leer_registros(string $ruta_absoluta, array $columnas, array $fechas = array(), string $inicio = 'A1'): array
+    final public function leer_registros(string $ruta_absoluta, array $columnas, array $fechas = array(),
+                                         string $inicio = 'A1'): array
     {
         $inputFileType = IOFactory::identify($ruta_absoluta);
-        $reader = IOFactory::createReader($inputFileType);
-        $reader->setReadDataOnly(true);
-        $reader->setReadEmptyCells(false);
-        $spreadsheet = $reader->load($ruta_absoluta);
-        $sheet = $spreadsheet->getSheet(0);
-        $maxCell = $sheet->getHighestRowAndColumn();
-        $rows = $sheet->rangeToArray("$inicio:" . $maxCell['column'] . $maxCell['row']);
+        try {
+            $reader = IOFactory::createReader($inputFileType);
+            $reader->setReadDataOnly(true);
+            $reader->setReadEmptyCells(false);
+            $spreadsheet = $reader->load($ruta_absoluta);
+            $sheet = $spreadsheet->getSheet(0);
+            $maxCell = $sheet->getHighestRowAndColumn();
+            $rows = $sheet->rangeToArray("$inicio:" . $maxCell['column'] . $maxCell['row']);
+        }
+        catch (Throwable $e){
+            return $this->error->error('Error: al leer datos', $e);
+        }
 
         $salida = array();
 
