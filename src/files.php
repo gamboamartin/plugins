@@ -39,7 +39,6 @@ class files{
 
     /**
      * Asigna los datos necesarios para verificar los archivos de un servicio
-     * @version 1.0.0
      * @param string $archivo Path o nombre del archivo
      * @return array|stdClass obj->file obj->es_lock obj->es_info obj->es_service
      */
@@ -266,7 +265,6 @@ class files{
 
     /**
      * Ajusta los archivos dentro de la carpeta services para su maquetacion
-     * @version 1.0.0
      * @param mixed $directorio Recurso tipo opendir
      * @return array un arreglo de objetos
      */
@@ -345,7 +343,6 @@ class files{
 
     /**
      * @param mixed $directorio Recurso tipo opendir
-     * @version 0.2.0 Se integra UT para monitor de servicios
      * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info]
      * pueden ser varios
      */
@@ -513,11 +510,10 @@ class files{
 
     /**
      * Verifica si la parte enviada esta vacia o no
-     * @version 1.0.0
      * @param string $parte Parte de un name file
      * @return bool
      */
-    PUBLIC function parte_to_name_file(string $parte): bool
+    private function parte_to_name_file(string $parte): bool
     {
         $todo_vacio = true;
         $parte = trim($parte);
@@ -590,7 +586,6 @@ class files{
 
     /**
      * Verificar si todas las partes de un name file estan vacias
-     * @version 1.0.0
      * @param array $explode conjunto de partes del nombre de un name file separados por .
      * @return bool|array Verdadero si todos los elementos estan vacios
      */
@@ -608,7 +603,6 @@ class files{
 
     /**
      * Valida los datos de un archivo para obtener una extension
-     * @version 1.0.0
      * @param string $archivo Ruta a verificar la extension
      * @return bool|array
      */
