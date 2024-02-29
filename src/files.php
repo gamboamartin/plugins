@@ -590,9 +590,13 @@ class files{
     }
 
     /**
-     * Verificar si todas las partes de un name file estan vacias
-     * @param array $explode conjunto de partes del nombre de un name file separados por .
-     * @return bool|array Verdadero si todos los elementos estan vacios
+     * POR DOCUMENTAR EN WIKI
+     * Función para comprobar si todos los elementos de una matriz están vacíos.
+     *
+     * @param array $explode La matriz a comprobar.
+     *
+     * @return bool|array Retorna TRUE si todos los elementos están vacíos, o un arreglo con errores en caso contrario.
+     * @version 4.4.0
      */
     private function todo_vacio(array $explode): bool|array
     {
