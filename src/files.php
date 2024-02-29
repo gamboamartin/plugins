@@ -509,9 +509,14 @@ class files{
     }
 
     /**
-     * Verifica si la parte enviada esta vacia o no
-     * @param string $parte Parte de un name file
-     * @return bool
+     * POR DOCUMENTAR WN WIKI
+     * Este método recibe como parámetro una parte del nombre del archivo,
+     * elimina los espacios en blanco al inicio y al final de dicho nombre y
+     * comprueba si dicho nombre no está vacío.
+     *
+     * @param string $parte Parámetro de entrada que representa una parte del nombre del archivo
+     * @return bool Retorna true si el nombre del archivo está vacío, en otro caso retorna false.
+     * @version 4.3.0
      */
     private function parte_to_name_file(string $parte): bool
     {
