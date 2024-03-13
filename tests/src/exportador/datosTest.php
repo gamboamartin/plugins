@@ -9,9 +9,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class datosTest extends test {
     public errores $errores;
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public function __construct(?string $name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
         $this->errores = new errores();
     }
 
