@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use stdClass;
 use Throwable;
 
 /**
@@ -80,7 +81,7 @@ class exportador
 
     public function genera_xls(bool  $header, string $name, array $nombre_hojas, array $keys_hojas, string $path_base,
                                array $size_columnas = array(), array $centers = array(), array $moneda = array(),
-                               array $moneda_sin_decimal = array()): array|string
+                               array $moneda_sin_decimal = array(),stdClass $totales_hoja = new stdClass()): array|string
     {
         if (trim($name) === '') {
             $error = $this->error->error('Error al $name no puede venir vacio', $name);
@@ -205,9 +206,15 @@ class exportador
                 die('Error');
             }
 
+            if(!isset($totales_hoja->$nombre_hoja)){
+                $totales_hoja->$nombre_hoja = array();
+            }
+
+            $totales = $totales_hoja->$nombre_hoja;
+
             $llenado = (new datos())->llena_libro_xls(columnas: $this->columnas, estilo_contenido: $this->estilo_contenido,
                 estilos: $this->estilos, index: $index, keys: $keys_hojas[$nombre_hoja]->keys, libro: $libro, path_base: $path_base,
-                registros: $keys_hojas[$nombre_hoja]->registros, totales: array());
+                registros: $keys_hojas[$nombre_hoja]->registros, totales: $totales);
             if (errores::$error) {
                 $error = $this->error->error('Error al generar $llenado', $llenado);
                 if (!$header) {

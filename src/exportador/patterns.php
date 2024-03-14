@@ -52,11 +52,10 @@ class patterns{
     }
 
     /**
-     * P ORDER P INT PROBADO
      * @param array $pattern
      * @return stdClass|array
      */
-    PUBLIC function asigna_data(array $pattern): stdClass|array
+    private function asigna_data(array $pattern): stdClass|array
     {
         $keys = array('tipo_dato','xls');
         $valida = $this->validacion->valida_existencia_keys(keys: $keys,registro:  $pattern);

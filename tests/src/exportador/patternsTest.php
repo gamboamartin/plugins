@@ -4,6 +4,7 @@ namespace tests\src\exportador;
 use gamboamartin\errores\errores;
 use gamboamartin\plugins\exportador\datos;
 use gamboamartin\plugins\exportador\patterns;
+use gamboamartin\test\liberator;
 use gamboamartin\test\test;
 use JsonException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -27,7 +28,7 @@ class patternsTest extends test {
         $path_base = '/var/www/html/plugins/';
         $valor = '';
         $patt = new patterns(path_base: $path_base, valor: $valor);
-        //$inicializacion = new liberator($inicializacion);
+        $patt = new liberator($patt);
 
         $pattern = array();
         $resultado = $patt->asigna_data($pattern);
