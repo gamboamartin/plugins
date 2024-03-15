@@ -147,8 +147,15 @@ class files{
         return $servicios;
     }
 
-    public static function del_dir_full(string $dir): bool
+    public static function del_dir_full(string $dir): bool|array
     {
+        $dir = trim($dir);
+        if($dir === ''){
+            return (new errores())->error(mensaje: 'Error el directorio esta vacio', data: $dir);
+        }
+        if(!file_exists($dir)){
+            return (new errores())->error(mensaje: 'Error no existe la ruta', data: $dir);
+        }
 
         $files = array_diff(scandir($dir), array('.','..'));
 
@@ -159,6 +166,10 @@ class files{
             else{
                 unlink("$dir/$file");
             }
+        }
+
+        if(!file_exists($dir)){
+            return (new errores())->error(mensaje: 'Error no existe la ruta', data: $dir);
         }
 
         return rmdir($dir);

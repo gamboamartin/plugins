@@ -1,6 +1,7 @@
 <?php
 namespace tests\src;
 
+use config\generales;
 use gamboamartin\errores\errores;
 use gamboamartin\plugins\files;
 use gamboamartin\test\liberator;
@@ -87,6 +88,18 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_del_dir_full(){
+        errores::$error = false;
+        $fl = new files();
+        //$fl = new liberator($fl);
+
+        $dir = (new generales())->path_base.'tests/prueba';
+        mkdir($dir);
+        $resultado = $fl::del_dir_full($dir);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+    }
     public function test_es_info_service()
     {
         errores::$error = false;
