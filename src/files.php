@@ -147,6 +147,24 @@ class files{
         return $servicios;
     }
 
+    public static function del_dir_full(string $dir): bool
+    {
+
+        $files = array_diff(scandir($dir), array('.','..'));
+
+        foreach ($files as $file) {
+            if(is_dir("$dir/$file")){
+                (new files())->del_dir_full("$dir/$file");
+            }
+            else{
+                unlink("$dir/$file");
+            }
+        }
+
+        return rmdir($dir);
+
+    }
+
     /**
      * Determina si el archivo es de tipo info para services
      * @version 1.0.0
