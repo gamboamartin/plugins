@@ -78,8 +78,10 @@ class Importador
         return $salida;
     }
 
-    final public function primer_row(string $celda_inicio, string $inputFileType, string $ruta_absoluta)
+    final public function primer_row(string $celda_inicio, string $ruta_absoluta)
     {
+        $inputFileType = IOFactory::identify($ruta_absoluta);
+
         $rows = $this->rows(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
             ruta_absoluta: $ruta_absoluta,max_cell_row: 1);
         if(errores::$error){
@@ -90,6 +92,33 @@ class Importador
 
     private function rows(string $celda_inicio, string $inputFileType, string $ruta_absoluta,
                           int $max_cell_row = -1): array
+    {
+
+        $valida = $this->valida_in_calc(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
+            ruta_absoluta:  $ruta_absoluta);
+        if(errores::$error){
+            return $this->error->error('Error al validar parametros', $valida);
+        }
+
+        try {
+            $reader = IOFactory::createReader($inputFileType);
+            $reader->setReadDataOnly(true);
+            $reader->setReadEmptyCells(false);
+            $spreadsheet = $reader->load($ruta_absoluta);
+            $sheet = $spreadsheet->getSheet(0);
+            $maxCell = $sheet->getHighestRowAndColumn();
+            if($max_cell_row === -1){
+                $max_cell_row = $maxCell['row'];
+            }
+            $rows = $sheet->rangeToArray("$celda_inicio:" . $maxCell['column'] . $max_cell_row);
+        }
+        catch (Throwable $e){
+            return $this->error->error('Error: al leer datos', $e);
+        }
+        return $rows;
+    }
+
+    private function valida_in_calc(string $celda_inicio, string $inputFileType, string $ruta_absoluta)
     {
         $celda_inicio = trim($celda_inicio);
         if($celda_inicio === ''){
@@ -110,21 +139,7 @@ class Importador
         if(errores::$error){
             return $this->error->error('Error al validar celda_inicio', $valida);
         }
-        try {
-            $reader = IOFactory::createReader($inputFileType);
-            $reader->setReadDataOnly(true);
-            $reader->setReadEmptyCells(false);
-            $spreadsheet = $reader->load($ruta_absoluta);
-            $sheet = $spreadsheet->getSheet(0);
-            $maxCell = $sheet->getHighestRowAndColumn();
-            if($max_cell_row === -1){
-                $max_cell_row = $maxCell['row'];
-            }
-            $rows = $sheet->rangeToArray("$celda_inicio:" . $maxCell['column'] . $max_cell_row);
-        }
-        catch (Throwable $e){
-            return $this->error->error('Error: al leer datos', $e);
-        }
-        return $rows;
+        return true;
+
     }
 }
