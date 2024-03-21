@@ -445,7 +445,7 @@ class filesTest extends test {
     {
         errores::$error = false;
         $fl = new files();
-        $fl = new liberator($fl);
+        //$fl = new liberator($fl);
 
         $archivo = '';
         $resultado = $fl->valida_extension($archivo);
