@@ -642,9 +642,9 @@ class files{
     /**
      * Valida los datos de un archivo para obtener una extension
      * @param string $archivo Ruta a verificar la extension
-     * @return bool|array
+     * @return true|array
      */
-    public function valida_extension(string $archivo): bool|array
+    final public function valida_extension(string $archivo): true|array
     {
         $archivo = trim($archivo);
         if($archivo === ''){
