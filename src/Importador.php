@@ -88,7 +88,8 @@ class Importador
         return $rows[0];
     }
 
-    private function rows(string $celda_inicio, string $inputFileType, string $ruta_absoluta, int $max_cell_row = -1): array
+    private function rows(string $celda_inicio, string $inputFileType, string $ruta_absoluta,
+                          int $max_cell_row = -1): array
     {
         $celda_inicio = trim($celda_inicio);
         if($celda_inicio === ''){
