@@ -3,6 +3,7 @@
 namespace gamboamartin\plugins;
 
 use gamboamartin\errores\errores;
+use gamboamartin\validacion\validacion;
 use JsonException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -40,17 +41,10 @@ class Importador
                                          string $inicio = 'A1'): array
     {
         $inputFileType = IOFactory::identify($ruta_absoluta);
-        try {
-            $reader = IOFactory::createReader($inputFileType);
-            $reader->setReadDataOnly(true);
-            $reader->setReadEmptyCells(false);
-            $spreadsheet = $reader->load($ruta_absoluta);
-            $sheet = $spreadsheet->getSheet(0);
-            $maxCell = $sheet->getHighestRowAndColumn();
-            $rows = $sheet->rangeToArray("$inicio:" . $maxCell['column'] . $maxCell['row']);
-        }
-        catch (Throwable $e){
-            return $this->error->error('Error: al leer datos', $e);
+
+        $rows = $this->rows(celda_inicio: $inicio,inputFileType:  $inputFileType,ruta_absoluta:  $ruta_absoluta);
+        if(errores::$error){
+            return $this->error->error('Error al obtener rows de archivo', $rows);
         }
 
         $salida = array();
@@ -82,5 +76,54 @@ class Importador
         }
 
         return $salida;
+    }
+
+    final public function primer_row(string $celda_inicio, string $inputFileType, string $ruta_absoluta)
+    {
+        $rows = $this->rows(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
+            ruta_absoluta: $ruta_absoluta,max_cell_row: 1);
+        if(errores::$error){
+            return $this->error->error('Error al obtener row de archivo', $rows);
+        }
+        return $rows[0];
+    }
+
+    private function rows(string $celda_inicio, string $inputFileType, string $ruta_absoluta, int $max_cell_row = -1): array
+    {
+        $celda_inicio = trim($celda_inicio);
+        if($celda_inicio === ''){
+            return $this->error->error('Error: celda_inicio esta vacia', $celda_inicio);
+        }
+        $inputFileType = trim($inputFileType);
+        if($inputFileType === ''){
+            return $this->error->error('Error: inputFileType esta vacia', $inputFileType);
+        }
+        $ruta_absoluta = trim($ruta_absoluta);
+        if($ruta_absoluta === ''){
+            return $this->error->error('Error: ruta_absoluta esta vacia', $ruta_absoluta);
+        }
+        if(!file_exists($ruta_absoluta)){
+            return $this->error->error('Error: ruta_absoluta no existe doc', $ruta_absoluta);
+        }
+        $valida = (new validacion())->valida_celda_calc(celda: $celda_inicio);
+        if(errores::$error){
+            return $this->error->error('Error al validar celda_inicio', $valida);
+        }
+        try {
+            $reader = IOFactory::createReader($inputFileType);
+            $reader->setReadDataOnly(true);
+            $reader->setReadEmptyCells(false);
+            $spreadsheet = $reader->load($ruta_absoluta);
+            $sheet = $spreadsheet->getSheet(0);
+            $maxCell = $sheet->getHighestRowAndColumn();
+            if($max_cell_row === -1){
+                $max_cell_row = $maxCell['row'];
+            }
+            $rows = $sheet->rangeToArray("$celda_inicio:" . $maxCell['column'] . $max_cell_row);
+        }
+        catch (Throwable $e){
+            return $this->error->error('Error: al leer datos', $e);
+        }
+        return $rows;
     }
 }
