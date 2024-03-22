@@ -538,7 +538,7 @@ class files{
     }
 
     /**
-     * POR DOCUMENTAR WN WIKI
+     * POR DOCUMENTAR WN WIKI FINAL REV
      * Este método recibe como parámetro una parte del nombre del archivo,
      * elimina los espacios en blanco al inicio y al final de dicho nombre y
      * comprueba si dicho nombre no está vacío.
@@ -619,7 +619,7 @@ class files{
     }
 
     /**
-     * POR DOCUMENTAR EN WIKI
+     * POR DOCUMENTAR EN WIKI FINAL REV
      * Función para comprobar si todos los elementos de una matriz están vacíos.
      *
      * @param array $explode La matriz a comprobar.
@@ -648,7 +648,7 @@ class files{
     {
         $archivo = trim($archivo);
         if($archivo === ''){
-            return $this->error->error(mensaje: 'Error archivo no puede venir vacio', data: $archivo);
+            return $this->error->error(mensaje: 'Error archivo no puede venir vacio', data: $archivo, es_final: true);
         }
         $explode = explode('.', $archivo);
         if(count($explode) === 1){
@@ -660,7 +660,7 @@ class files{
                 mensaje: 'Error al validar si estan vacios todos los elementos de un name file', data: $todo_vacio);
         }
         if($todo_vacio){
-            return $this->error->error(mensaje: 'Error el archivo solo tiene puntos', data: $archivo);
+            return $this->error->error(mensaje: 'Error el archivo solo tiene puntos', data: $archivo, es_final: true);
         }
 
 
