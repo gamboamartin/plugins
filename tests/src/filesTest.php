@@ -224,8 +224,6 @@ class filesTest extends test {
         $this->assertEquals("service1.php.lock", $resultado[0]->name_file);
         errores::$error = false;
     }
-
-
     public function test_extension(){
         errores::$error = false;
         $fl = new files();
@@ -373,6 +371,23 @@ class filesTest extends test {
         $resultado = $fl->maqueta_files_service($archivos);
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
+
+        errores::$error = false;
+    }
+
+    public function test_name_service()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $archivo = 'a.php';
+
+        $resultado = $fl->name_service($archivo);
+        $this->assertIsString($resultado);
+        $this->assertEquals('a',$resultado);
+        $this->assertNotTrue(errores::$error);
+
 
         errores::$error = false;
     }

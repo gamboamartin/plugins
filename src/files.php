@@ -178,7 +178,6 @@ class files{
 
     /**
      * Determina si el archivo es de tipo info para services
-     * @version 1.0.0
      * @param string $archivo Ruta a verificar el tipo
      * @return bool|array
      */
@@ -202,7 +201,6 @@ class files{
 
     /**
      * Te dice el archivo es un lock del paquete servicios
-     * @version 1.0.0
      * @param string $archivo Path o nombre del archivo
      * @return bool|array verdadero si es lock falso si no, array error
      */
@@ -226,7 +224,6 @@ class files{
 
     /**
      * Determina si un file es un service para ejecucion de servicios
-     * @version 1.0.0
      * @param string $archivo Ruta a verificar el tipo
      * @return bool|array
      */
@@ -279,7 +276,6 @@ class files{
      * Obtiene la extension de un archivo mandando solamente el nombre del doc
      * @param string $archivo Path o nombre del archivo
      * @return string|array string = extension del archivo array error
-     * @version 1.0.0
      */
     public function extension(string $archivo): string|array
     {
@@ -521,9 +517,26 @@ class files{
         return $muestra;
     }
 
-    private function name_service(string $archivo): string
+    /**
+     * POR DOCUMENTAR EN WIKI
+     * name_service Esta función se utiliza para dar nombre al servicio.
+     *
+     * @param string $archivo Nombre del archivo del que se va a extraer el nombre del servicio.
+     *
+     * @return string|array Devuelve un string con el nombre del servicio.
+     * Si el nombre del archivo está vacío o el archivo no es de PHP, devuelve un array con un mensaje de error y los datos relevantes.
+     *
+     * @throws errores Sí ocurre un error durante la asignación del nombre del servicio.
+     * @version 6.2.0
+     */
+    private function name_service(string $archivo): string|array
     {
+        $archivo = trim($archivo);
+        if($archivo === ''){
+            return $this->error->error(mensaje: 'Error archivo vacio',data:  $archivo,es_final: true);
+        }
         $explode_name = explode('.php', $archivo);
+
         return $explode_name[0];
     }
 
@@ -640,9 +653,17 @@ class files{
     }
 
     /**
-     * Valida los datos de un archivo para obtener una extension
-     * @param string $archivo Ruta a verificar la extension
-     * @return true|array
+     * POR DOCUMENTAR EN WIKI ERROR FINAL
+     * valida_extension Comprueba si el archivo dado tiene una extensión y si sus elementos no están vacíos.
+     *
+     * @param string $archivo Es el nombre del archivo a comprobar.
+     *
+     * @return true|array Devuelve true si el archivo tiene una extensión válida.
+     * Si el nombre del archivo está vacío, está compuesto solo por puntos o si alguno de sus elementos está vacío,
+     * devuelve un array con un mensaje de error y los datos relevantes.
+     *
+     * @throws errores Si ocurre un error durante la comprobación.
+     * @version 6.2.0
      */
     final public function valida_extension(string $archivo): true|array
     {
