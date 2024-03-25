@@ -29,6 +29,26 @@ class Importador
         return self::$instance;
     }
 
+    final public function leer(string $ruta_absoluta)
+    {
+        $columns = $this->primer_row(celda_inicio: 'A1',ruta_absoluta:  $ruta_absoluta);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener columns',data:  $columns);
+        }
+
+        $rows = $this->leer_registros(ruta_absoluta:  $ruta_absoluta, columnas: $columns);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al obtener rows',data:  $rows);
+        }
+
+        $datos = new stdClass();
+        $datos->columns = $columns;
+        $datos->rows = $rows;
+
+        return $datos;
+
+    }
+
     /**
      * Lee los registros de un archivo excel
      * @param string $ruta_absoluta // ruta del archivo a leer
@@ -122,18 +142,18 @@ class Importador
     {
         $celda_inicio = trim($celda_inicio);
         if($celda_inicio === ''){
-            return $this->error->error('Error: celda_inicio esta vacia', $celda_inicio);
+            return $this->error->error('Error: celda_inicio esta vacia', $celda_inicio, es_final: true);
         }
         $inputFileType = trim($inputFileType);
         if($inputFileType === ''){
-            return $this->error->error('Error: inputFileType esta vacia', $inputFileType);
+            return $this->error->error('Error: inputFileType esta vacia', $inputFileType, es_final: true);
         }
         $ruta_absoluta = trim($ruta_absoluta);
         if($ruta_absoluta === ''){
-            return $this->error->error('Error: ruta_absoluta esta vacia', $ruta_absoluta);
+            return $this->error->error('Error: ruta_absoluta esta vacia', $ruta_absoluta, es_final: true);
         }
         if(!file_exists($ruta_absoluta)){
-            return $this->error->error('Error: ruta_absoluta no existe doc', $ruta_absoluta);
+            return $this->error->error('Error: ruta_absoluta no existe doc', $ruta_absoluta, es_final: true);
         }
         $valida = (new validacion())->valida_celda_calc(celda: $celda_inicio);
         if(errores::$error){
