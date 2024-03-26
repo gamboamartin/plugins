@@ -273,11 +273,21 @@ class files{
     }
 
     /**
-     * Obtiene la extension de un archivo mandando solamente el nombre del doc
-     * @param string $archivo Path o nombre del archivo
-     * @return string|array string = extension del archivo array error
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * Obtiene la extensión de un archivo dado.
+     *
+     * Esta función toma un nombre de archivo como entrada y devuelve su extensión.
+     * Primero, valida la extensión del archivo y en caso de error devuelve un mensaje de error.
+     * Luego utiliza la clase SplFileInfo para obtener la extensión del archivo.
+     *
+     * @param string $archivo El nombre del archivo del que se va a obtener la extensión.
+     *
+     * @return string|array La extensión del archivo o un error si la validación no es exitosa.
+     *
+     * @throws errores En caso de que ocurra un error durante la validación de la extensión.
+     * @version 6.4.0
      */
-    public function extension(string $archivo): string|array
+    final public function extension(string $archivo): string|array
     {
         $valida = $this->valida_extension(archivo: $archivo);
         if(errores::$error){
