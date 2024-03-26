@@ -177,9 +177,18 @@ class files{
     }
 
     /**
-     * Determina si el archivo es de tipo info para services
-     * @param string $archivo Ruta a verificar el tipo
-     * @return bool|array
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * Este método se utiliza para validar si la extensión de un archivo especificado
+     * corresponde a un archivo .info de un servicio.
+     *
+     * @version   1.0.0
+     * @param     string $archivo Representa la ruta del archivo que se va a validar.
+     * @return    bool|array Retorna verdadero si la extensión del archivo es .info,
+     *                        De lo contrario, devuelve un objeto de error
+     *
+     * Ejemplo de uso:
+     * $instancia->es_info_service('/ruta/al/archivo.info');
+     * @version 6.5.0
      */
     private function es_info_service(string $archivo): bool|array
     {
@@ -200,9 +209,17 @@ class files{
     }
 
     /**
-     * Te dice el archivo es un lock del paquete servicios
-     * @param string $archivo Path o nombre del archivo
-     * @return bool|array verdadero si es lock falso si no, array error
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * Este método se utiliza para validar si la extensión de un archivo especificado
+     * corresponde a un archivo .lock de un servicio.
+     *
+     * @param     string $archivo Representa la ruta del archivo que se va a validar.
+     * @return    bool|array Retorna verdadero si la extensión del archivo es .lock,
+     *                        De lo contrario, devuelve un objeto de error
+     *
+     * Ejemplo de uso:
+     * $instancia->es_lock_service('/ruta/al/archivo.lock');
+     * @version 6.5.0
      */
     private function es_lock_service(string $archivo): bool|array
     {
