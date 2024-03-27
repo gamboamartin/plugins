@@ -47,6 +47,44 @@ class ImportadorTest extends test {
 
     }
 
+    public function test_data_xls()
+    {
+        errores::$error = false;
+        $importador = new Importador();
+        $importador = new liberator($importador);
+
+
+        $i = 1;
+        $j = 0;
+        $columnas = array();
+        $columnas[0] = 'A';
+        $rows = array();
+        $resultado = $importador->data_xls($columnas, $i, $j, $rows);
+
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("A", $resultado->columna);
+        $this->assertEquals("", $resultado->value);
+
+        errores::$error = false;
+
+        $i = 1;
+        $j = 0;
+        $columnas = array();
+        $columnas[0] = 'A';
+        $rows = array();
+        $rows[1] = 'p';
+        $resultado = $importador->data_xls($columnas, $i, $j, $rows);
+
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("A", $resultado->columna);
+        $this->assertEquals("p", $resultado->value);
+
+        errores::$error = false;
+
+    }
+
     public function test_rows()
     {
         errores::$error = false;

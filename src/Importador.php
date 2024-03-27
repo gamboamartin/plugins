@@ -4,7 +4,6 @@ namespace gamboamartin\plugins;
 
 use gamboamartin\errores\errores;
 use gamboamartin\validacion\validacion;
-use JsonException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use stdClass;
@@ -20,6 +19,42 @@ class Importador
         $this->error = new errores();
     }
 
+    private function data_xls(array $columnas, int $i, int $j, array $rows): stdClass|array
+    {
+
+
+        $valida = $this->valida_row(i: $i,j:  $j,columnas:  $columnas);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error: al validar row', data: $valida);
+        }
+
+        $columna = $columnas[$j];
+        $value = $rows[$i][$j];
+        if(!is_null($value)){
+            $value = str_replace("'", "", $value);
+        }
+
+        $rs = new stdClass();
+        $rs->columna = $columna;
+        $rs->value = $value;
+
+        return $rs;
+
+    }
+
+    private function genera_campo_fecha(string $columna, array $fechas, stdClass $registros)
+    {
+        if (in_array($columna, $fechas) && !empty($registros->$columna)) {
+
+            $registros = $this->integra_campo_fecha(registros: $registros,columna:  $columna);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error: al integrar row fecha', data: $registros);
+            }
+        }
+        return $registros;
+
+    }
+
     public static function getInstance(): Importador
     {
         if (!self::$instance instanceof self) {
@@ -27,6 +62,50 @@ class Importador
         }
 
         return self::$instance;
+    }
+
+    private function integra_campo_fecha(stdClass $registros, string $columna): array|stdClass
+    {
+        if (strtotime($registros->$columna)) {
+            $registros->$columna = Date::PHPToExcel($registros->$columna);
+        }
+
+        if (!is_numeric($registros->$columna)) {
+            return $this->error->error(mensaje: 'Error: la fecha no tiene el formato correcto', data: $registros->$columna);
+        }
+
+        $registros->$columna = Date::excelToDateTimeObject($registros->$columna)->format('Y-m-d');
+
+        return $registros;
+
+    }
+
+    private function integra_valor(array $columnas, array $fechas, int $i, int $j, stdClass $registros, array $rows)
+    {
+        if (count($rows[$i]) !== count($columnas)) {
+            return $this->error->error(mensaje: 'Error: el numero de columnas no coincide',data:  $columnas);
+        }
+        $valida = $this->valida_row(i: $i,j:  $j,columnas:  $columnas);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error: al validar row', data: $valida);
+        }
+
+        $columna = $columnas[$j];
+
+        $data_cel = $this->data_xls(columnas: $columnas,i:  $i,j:  $j,rows:  $rows);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error: al integrar data_cel', data: $data_cel);
+        }
+
+        $registros->$columna = $data_cel->value;
+
+        $registros = $this->genera_campo_fecha(columna: $columna, fechas: $fechas,registros:  $registros);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error: al integrar row fecha', data: $registros);
+        }
+
+        return $registros;
+
     }
 
     final public function leer(string $ruta_absoluta)
@@ -67,35 +146,31 @@ class Importador
             return $this->error->error('Error al obtener rows de archivo', $rows);
         }
 
-        $salida = array();
-
-        for ($i = 1; $i < count($rows); $i++) {
-            $registros = new stdClass();
-            for ($j = 0; $j < count($rows[$i]); $j++) {
-
-                if (count($rows[$i]) !== count($columnas)) {
-                    return $this->error->error('Error: el numero de columnas no coincide', $columnas);
-                }
-
-                $columna = $columnas[$j];
-                $registros->$columna = !is_null($rows[$i][$j])? str_replace("'", "", $rows[$i][$j]) : $rows[$i][$j];
-
-                if (in_array($columna, $fechas) && !empty($registros->$columna)) {
-                    if (strtotime($registros->$columna)) {
-                        $registros->$columna = Date::PHPToExcel($registros->$columna);
-                    }
-
-                    if (!is_numeric($registros->$columna)) {
-                        return $this->error->error('Error: la fecha no tiene el formato correcto', $registros->$columna);
-                    }
-
-                    $registros->$columna = Date::excelToDateTimeObject($registros->$columna)->format('Y-m-d');
-                }
-            }
-            $salida[] = $registros;
+        $salida = $this->salida(columnas: $columnas,fechas:  $fechas,rows:  $rows);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error: al integrar salida', data: $salida);
         }
 
         return $salida;
+    }
+
+    private function maqueta_fila(array $columnas, array $fechas, int $i, array $rows)
+    {
+        $registros = new stdClass();
+        for ($j = 0; $j < count($rows[$i]); $j++) {
+
+            $valida = $this->valida_row(i: $i,j:  $j,columnas:  $columnas);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error: al validar row', data: $valida);
+            }
+            $registros = $this->integra_valor(columnas: $columnas,fechas:  $fechas,i:  $i,j:  $j,registros:  $registros,rows:  $rows);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error: al integrar row fecha', data: $registros);
+            }
+
+        }
+        return $registros;
+
     }
 
     final public function primer_row(string $celda_inicio, string $ruta_absoluta)
@@ -152,6 +227,22 @@ class Importador
         return $rows;
     }
 
+    private function salida(array $columnas, array $fechas, array $rows)
+    {
+        $salida = array();
+
+        for ($i = 1; $i < count($rows); $i++) {
+            $registros = $this->maqueta_fila(columnas: $columnas,fechas:  $fechas,i:  $i,rows:  $rows);
+            if(errores::$error){
+                return $this->error->error(mensaje: 'Error: al integrar row fecha', data: $registros);
+            }
+
+            $salida[] = $registros;
+        }
+        return $salida;
+
+    }
+
     /**
      * POR DOCUMENTAR EN WIKI FINAL REV
      * Esta método privado valida information para un proceso de importación en una hoja de cálculo.
@@ -190,6 +281,24 @@ class Importador
         $valida = (new validacion())->valida_celda_calc(celda: $celda_inicio);
         if(errores::$error){
             return $this->error->error('Error al validar celda_inicio', $valida);
+        }
+        return true;
+
+    }
+
+    private function valida_row(int $i, int $j, array $columnas): true|array
+    {
+        if($j < 0){
+            return $this->error->error(mensaje: 'Error: el contador j debe ser mayor o igual a 0', data: $j,
+                es_final: true);
+        }
+        if($i < 1){
+            return $this->error->error(mensaje: 'Error: el contador i debe ser mayor a 0', data: $i,
+                es_final: true);
+        }
+        if(!isset($columnas[$j])){
+            return $this->error->error(mensaje: 'Error: no existe la columna[$j]', data: $columnas,
+                es_final: true);
         }
         return true;
 
