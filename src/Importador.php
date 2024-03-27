@@ -110,6 +110,20 @@ class Importador
         return $rows[0];
     }
 
+    /**
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * @param string $celda_inicio Es la celda por la que el método empezará a leer.
+     * @param string $inputFileType Es el tipo de archivo de entrada que será leído.
+     * @param string $ruta_absoluta Es la ruta absoluta en tu sistema de donde se encuentra el archivo a leer.
+     * @param int $max_cell_row Es el número máximo de celdas que se leerán por fila. Si se deja en -1, se leerán todas las celdas.
+     *
+     * @return array Este método devolverá un arreglo que contiene todos los datos que se leyeron del archivo.
+     *
+     * Esta función lee las filas del archivo excel desde la celda de inicio especificada. También valida los parámetros
+     * proporcionado. Si encuentra un error, se detendrá y devolverá el error.
+     *
+     * @version 6.7.0
+     */
     private function rows(string $celda_inicio, string $inputFileType, string $ruta_absoluta,
                           int $max_cell_row = -1): array
     {
@@ -117,7 +131,7 @@ class Importador
         $valida = $this->valida_in_calc(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
             ruta_absoluta:  $ruta_absoluta);
         if(errores::$error){
-            return $this->error->error('Error al validar parametros', $valida);
+            return $this->error->error(mensaje: 'Error al validar parametros', data: $valida);
         }
 
         try {
@@ -133,7 +147,7 @@ class Importador
             $rows = $sheet->rangeToArray("$celda_inicio:" . $maxCell['column'] . $max_cell_row);
         }
         catch (Throwable $e){
-            return $this->error->error('Error: al leer datos', $e);
+            return $this->error->error(mensaje: 'Error: al leer datos', data: $e, es_final: true);
         }
         return $rows;
     }

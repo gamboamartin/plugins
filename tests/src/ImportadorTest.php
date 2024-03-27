@@ -47,6 +47,39 @@ class ImportadorTest extends test {
 
     }
 
+    public function test_rows()
+    {
+        errores::$error = false;
+        $importador = new Importador();
+        $importador = new liberator($importador);
+
+        $ruta_absoluta = (new generales())->path_base.'tests/cat_sat_tipo_relacion';
+
+        //$ruta_absoluta = 'C';
+        $inputFileType = 'Ods';
+        $celda_inicio = 'A1';
+        $resultado = $importador->rows($celda_inicio, $inputFileType, $ruta_absoluta);
+        //print_r($resultado);exit;
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("id", $resultado[0][0]);
+        $this->assertEquals("Notas de Crédito de Documentos Relacionados", $resultado[1][1]);
+        $this->assertEquals("02", $resultado[2][2]);
+        $this->assertEquals("3", $resultado[3][0]);
+        errores::$error = false;
+
+        $inputFileType = 'Ods';
+        $celda_inicio = 'A1';
+        $resultado = $importador->rows($celda_inicio, $inputFileType, $ruta_absoluta,1);
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertCount(1,$resultado);
+        $this->assertCount(3,$resultado[0]);
+
+        errores::$error = false;
+
+    }
+
     public function test_valida_in_calc()
     {
         errores::$error = false;
