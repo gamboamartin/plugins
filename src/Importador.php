@@ -138,7 +138,25 @@ class Importador
         return $rows;
     }
 
-    private function valida_in_calc(string $celda_inicio, string $inputFileType, string $ruta_absoluta)
+    /**
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * Esta método privado valida information para un proceso de importación en una hoja de cálculo.
+     *
+     * @param string $celda_inicio   La celda de inicio en una hoja de cálculo.
+     * @param string $inputFileType  El tipo de archivo que se va a importar (ej. 'Xlsx' , 'Csv').
+     * @param string $ruta_absoluta  La ruta absoluta del archivo que se va a importar.
+     *
+     * Primero, esta función verifica si la celda_inicio, el inputFileType y la ruta_absoluta están vacíos. Si está vacío, muestra un error.
+     * Después, verifica si la ruta_absoluta existe. Si no existe, muestra un error.
+     * Luego, valida si la celda de inicio es una celda válida en la hoja de cálculo.
+     * Si todo es válido, la función devuelve true, de lo contrario, muestra un error.
+     *
+     * @return true|array Retorna `true` si todas las validaciones pasan correctamente, de lo contrario retorna `false`.
+     *
+     * @throws errores  Esta excepción es lanzada si ocurrió un error durante las validaciones.
+     * @version 6.6.0
+     */
+    private function valida_in_calc(string $celda_inicio, string $inputFileType, string $ruta_absoluta): true|array
     {
         $celda_inicio = trim($celda_inicio);
         if($celda_inicio === ''){

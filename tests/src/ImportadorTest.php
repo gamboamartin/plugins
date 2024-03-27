@@ -47,6 +47,26 @@ class ImportadorTest extends test {
 
     }
 
+    public function test_valida_in_calc()
+    {
+        errores::$error = false;
+        $importador = new Importador();
+        $importador = new liberator($importador);
+
+        $ruta_absoluta = (new generales())->path_base.'tests/cat_sat_tipo_relacion';
+        //$ruta_absoluta = 'C';
+        $inputFileType = 'B';
+        $celda_inicio = 'A1';
+        $resultado = $importador->valida_in_calc($celda_inicio, $inputFileType, $ruta_absoluta);
+        //print_r($resultado);exit;
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertTrue($resultado);
+
+        errores::$error = false;
+
+    }
+
 
 
 
