@@ -85,6 +85,27 @@ class ImportadorTest extends test {
 
     }
 
+    public function test_primer_row()
+    {
+        errores::$error = false;
+        $importador = new Importador();
+        //$importador = new liberator($importador);
+
+
+        $celda_inicio = 'B1';
+        $ruta_absoluta = (new generales())->path_base."tests/cat_sat_tipo_relacion";
+        $resultado = $importador->primer_row($celda_inicio, $ruta_absoluta);
+
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("descripcion", $resultado[0]);
+        $this->assertEquals("codigo", $resultado[1]);
+
+        errores::$error = false;
+
+
+    }
+
     public function test_rows()
     {
         errores::$error = false;

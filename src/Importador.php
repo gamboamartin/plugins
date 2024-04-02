@@ -141,6 +141,12 @@ class Importador
     {
         $inputFileType = IOFactory::identify($ruta_absoluta);
 
+        $valida = $this->valida_in_calc(celda_inicio: $inicio,inputFileType:  $inputFileType,
+            ruta_absoluta:  $ruta_absoluta);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar parametros', data: $valida);
+        }
+
         $rows = $this->rows(celda_inicio: $inicio,inputFileType:  $inputFileType,ruta_absoluta:  $ruta_absoluta);
         if(errores::$error){
             return $this->error->error('Error al obtener rows de archivo', $rows);
@@ -173,9 +179,42 @@ class Importador
 
     }
 
-    final public function primer_row(string $celda_inicio, string $ruta_absoluta)
+    /**
+     * POR DOCUMENTAR EN WIKI FINAL REV
+     * @final
+     *
+     * @param string $celda_inicio La celda de inicio para leer el archivo.
+     * @param string $ruta_absoluta La ruta absoluta del archivo a leer.
+     *
+     * @return array Retorna la primera fila del archivo. En caso de error, se reporta la  error.
+     *
+     * Esta función abre el archivo especificado por $ruta_absoluta,
+     * realiza algunas validaciones e intenta leerlo desde la celda de inicio
+     * especificada por $celda_inicio. Si las validaciones son exitosas,
+     * devuelve la primera fila del archivo.
+     *
+     * @example
+     *    primer_row('A1', '/ruta/absoluta/al/archivo.xlsx');
+     *
+     * @version 6.9.0
+     */
+    final public function primer_row(string $celda_inicio, string $ruta_absoluta): array
     {
+        $ruta_absoluta = trim($ruta_absoluta);
+        if($ruta_absoluta === ''){
+            return $this->error->error('Error ruta_absoluta esta vacia', $ruta_absoluta, es_final: true);
+        }
+        if(!file_exists($ruta_absoluta)){
+            return $this->error->error('Error ruta_absoluta no existe file', $ruta_absoluta, es_final: true);
+        }
+
         $inputFileType = IOFactory::identify($ruta_absoluta);
+
+        $valida = $this->valida_in_calc(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
+            ruta_absoluta:  $ruta_absoluta);
+        if(errores::$error){
+            return $this->error->error(mensaje: 'Error al validar parametros', data: $valida);
+        }
 
         $rows = $this->rows(celda_inicio: $celda_inicio,inputFileType:  $inputFileType,
             ruta_absoluta: $ruta_absoluta,max_cell_row: 1);
