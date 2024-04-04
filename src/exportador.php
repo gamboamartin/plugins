@@ -84,7 +84,7 @@ class exportador
                                array $moneda_sin_decimal = array(),stdClass $totales_hoja = new stdClass()): array|string
     {
         if (trim($name) === '') {
-            $error = $this->error->error('Error al $name no puede venir vacio', $name);
+            $error = $this->error->error('Error al $name no puede venir vacio', $name,es_final: true);
             if (!$header) {
                 return $error;
             }
@@ -93,7 +93,7 @@ class exportador
         }
 
         if (empty($nombre_hojas)) {
-            $error = $this->error->error('Error nombre_hojas no puede venir vacio', $nombre_hojas);
+            $error = $this->error->error('Error nombre_hojas no puede venir vacio', $nombre_hojas,es_final: true);
             if (!$header) {
                 return $error;
             }
@@ -103,7 +103,7 @@ class exportador
 
         if (sizeof($nombre_hojas) !== $this->num_hojas) {
             $error = $this->error->error('Error tiene que existir la misma cantidad de nombres de hojas que 
-            el total de $num_hojas declaradas', $nombre_hojas);
+            el total de $num_hojas declaradas', $nombre_hojas,es_final: true);
             if (!$header) {
                 return $error;
             }
@@ -113,7 +113,7 @@ class exportador
 
         foreach ($nombre_hojas as $nombre_hoja) {
             if (trim($nombre_hoja) === '') {
-                $error = $this->error->error('Error $nombre_hoja no puede venir vacio', $nombre_hoja);
+                $error = $this->error->error('Error $nombre_hoja no puede venir vacio', $nombre_hoja,es_final: true);
                 if (!$header) {
                     return $error;
                 }
@@ -122,7 +122,7 @@ class exportador
             }
 
             if (!is_string($nombre_hoja)) {
-                $error = $this->error->error('Error $nombre_hoja tiene que ser una cadena de texto', $nombre_hoja);
+                $error = $this->error->error('Error $nombre_hoja tiene que ser una cadena de texto', $nombre_hoja,es_final: true);
                 if (!$header) {
                     return $error;
                 }
@@ -136,7 +136,7 @@ class exportador
         foreach ($nombre_hojas as $index => $nombre_hoja) {
 
             if ($index < $this->num_hojas - 1) {
-                $libro->createSheet();
+                $libro->createSheet(sheetIndex: $index);
             }
 
             if (!array_key_exists($nombre_hoja, $keys_hojas)) {

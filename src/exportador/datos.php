@@ -120,8 +120,8 @@ class datos{
      * @param int $numero_columna
      * @param string $path_base
      * @param array $registro
+     * @param string $color_contenido
      * @return array
-     * @throws JsonException
      */
     private function llena_datos_xls(string $campo, array $columnas, array $estilo_contenido, array $estilos,
                                      int $fila, int $index, Spreadsheet $libro, int $numero_columna,
@@ -185,7 +185,6 @@ class datos{
      * @param array $registros
      * @param array $totales
      * @return array
-     * @throws JsonException
      */
     public function llena_libro_xls(array $columnas, array $estilo_contenido, array $estilos, int $index, array $keys,
                                      Spreadsheet $libro, string $path_base, array $registros, array $totales,
@@ -239,7 +238,6 @@ class datos{
      * @param string $path_base
      * @param array $registro
      * @return array
-     * @throws JsonException
      */
     private function llena_registro_xls(array $columnas, array $estilo_contenido, array $estilos, int $fila,
                                         int $index, array $keys, Spreadsheet$libro, string $path_base,

@@ -55,7 +55,6 @@ class estilos{
      * @param string $path_base
      * @param string $valor
      * @return string|bool
-     * @throws JsonException
      */
     public function estilos_format(string $path_base, string $valor): string|bool
     {
