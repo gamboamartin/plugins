@@ -18,6 +18,8 @@
     ],
     "require": {
         "smalot/pdfparser": "^v2.11.0",
+        "endroid/qr-code": "^5.0.9",
+        "zxing/qr-reader": "^v1.2",
         "gamboa.martin/errores": "^6.0.0",
         "gamboa.martin/test": "^5.0.0",
         "gamboa.martin/validacion": "^5.0.0",
