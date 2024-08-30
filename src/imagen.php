@@ -5,7 +5,7 @@ namespace gamboamartin\plugins;
 use gamboamartin\errores\errores;
 use Zxing\QrReader;
 
-class Imagen
+class imagen
 {
     public errores $error;
 

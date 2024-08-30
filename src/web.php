@@ -6,7 +6,7 @@ use gamboamartin\errores\errores;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-class Web
+class web
 {
     public errores $error;
 

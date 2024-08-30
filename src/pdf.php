@@ -6,7 +6,7 @@ use Exception;
 use gamboamartin\errores\errores;
 use Smalot\PdfParser\Parser;
 
-class PDF
+class pdf
 {
     public errores $error;
 
