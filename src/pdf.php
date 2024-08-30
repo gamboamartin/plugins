@@ -51,8 +51,13 @@ class PDF
             mkdir($directorio, 0777, true);
         }
 
+        if (!file_exists($ruta_pdf)) {
+            return $this->error->error(mensaje: "El archivo PDF no existe.", data: $ruta_pdf);
+        }
+
         $output_dir = realpath($directorio) . DIRECTORY_SEPARATOR . $prefijo_imagen;
-        $command = escapeshellcmd("pdfimages -png \"$ruta_pdf\" \"$output_dir\"");
+
+        $command = 'pdfimages -png ' . escapeshellarg($ruta_pdf) . ' ' . escapeshellarg($output_dir);
 
         $output = [];
         $return_var = null;
