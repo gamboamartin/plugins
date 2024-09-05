@@ -34,4 +34,29 @@ class imagen
         return $texto;
     }
 
+    function obtener_qr(array $imagenes): string|array
+    {
+        $old_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED);
+
+        foreach ($imagenes as $ruta_imagen) {
+
+            $qrcode = new QrReader($ruta_imagen);
+
+            if (empty($qrcode->result)) {
+                continue;
+            }
+
+            $texto = $qrcode->text();
+
+            if ($texto !== null) {
+                error_reporting($old_error_reporting);
+                return $ruta_imagen;
+            }
+        }
+
+        error_reporting($old_error_reporting);
+
+        return $this->error->error(mensaje: "No se encontro un código QR valido", data: $imagenes);
+    }
+
 }
