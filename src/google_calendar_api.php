@@ -4,13 +4,16 @@ namespace gamboamartin\plugins;
 
 use Exception;
 use InvalidArgumentException;
+use PhpParser\Node\Scalar\String_;
 
-class GoogleCalendarApi
+class google_calendar_api
 {
-    const OAUTH2_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token';
-    const CALENDAR_TIMEZONE_URI = 'https://www.googleapis.com/calendar/v3/users/me/settings/timezone';
-    const CALENDAR_LIST_URI = 'https://www.googleapis.com/calendar/v3/users/me/calendarList';
-    const CALENDAR_EVENT = 'https://www.googleapis.com/calendar/v3/calendars/';
+    const string OAUTH2_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token';
+    const string CALENDAR_TIMEZONE_URI = 'https://www.googleapis.com/calendar/v3/users/me/settings/timezone';
+    const string CALENDAR_LIST_URI = 'https://www.googleapis.com/calendar/v3/users/me/calendarList';
+    const string CALENDAR_EVENT = 'https://www.googleapis.com/calendar/v3/calendars/';
+
+    const string GOOGLE_OAUTH_SCOPE = 'https://www.googleapis.com/auth/calendar';
 
     function __construct($params = array())
     {
@@ -23,7 +26,7 @@ class GoogleCalendarApi
         }
     }
 
-    function inicializar($params = array())
+    function inicializar($params = array()): void
     {
         if (count($params) > 0) {
             foreach ($params as $key => $value) {
@@ -32,6 +35,25 @@ class GoogleCalendarApi
                 }
             }
         }
+    }
+
+    /**
+     * @param string $google_client_id Id del cliente de Google API (se obtiene en la consola de Google API)
+     * @param string $google_redirect_uri URL de redirección después de la autorización del usuario en Google API
+     * (se configura en la consola de Google API)
+     * @return string
+     */
+    public function get_oauth_url(string $google_client_id, string $google_redirect_uri): string
+    {
+        $query_params = [
+            'scope' => self::GOOGLE_OAUTH_SCOPE,
+            'redirect_uri' => $google_redirect_uri,
+            'response_type' => 'code',
+            'client_id' => $google_client_id,
+            'access_type' => 'online'
+        ];
+
+        return 'https://accounts.google.com/o/oauth2/auth?' . http_build_query($query_params);
     }
 
     /**
@@ -44,8 +66,8 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function get_access_token(string $client_id, string $redirect_uri, string $client_secret, string $code,
-                                     bool   $ssl_verify = false)
+    final public function get_access_token(string $client_id, string $redirect_uri, string $client_secret, string $code,
+                                           bool   $ssl_verify = false): array
     {
         $campos_post = http_build_query([
             'client_id' => $client_id,
@@ -93,7 +115,7 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function get_calendar_timezone(string $access_token, bool $ssl_verify = false)
+    final public function get_calendar_timezone(string $access_token, bool $ssl_verify = false): string
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, self::CALENDAR_TIMEZONE_URI);
@@ -132,7 +154,7 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function get_calendar_list(string $access_token, bool $ssl_verify = false)
+    final public function get_calendar_list(string $access_token, bool $ssl_verify = false): array
     {
         $url_params = [
             'fields' => 'items(id,summary,timeZone)',
@@ -181,8 +203,8 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function get_calendar_events(string $access_token, string $calendar_id, string $time_min = null,
-                                        string $time_max = null, bool $ssl_verify = false)
+    final public function get_calendar_events(string $access_token, string $calendar_id, string $time_min = null,
+                                              string $time_max = null, bool $ssl_verify = false): array
     {
         $url_params = [
             'orderBy' => 'startTime',
@@ -242,8 +264,8 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function crear_calendario(string $access_token, string $summary, ?string $description = null,
-                                     string $timeZone = 'UTC', bool $ssl_verify = false)
+    final public function crear_calendario(string $access_token, string $summary, ?string $description = null,
+                                           string $timeZone = 'UTC', bool $ssl_verify = false): array
     {
         $calendar_data = [
             'summary' => $summary,
@@ -292,9 +314,9 @@ class GoogleCalendarApi
      * @return mixed
      * @throws Exception
      */
-    public function actualizar_calendario(string  $access_token, string $calendar_id, string $summary,
-                                          ?string $description = null, ?string $timeZone = 'UTC',
-                                          bool    $ssl_verify = false)
+    final public function actualizar_calendario(string  $access_token, string $calendar_id, string $summary,
+                                                ?string $description = null, ?string $timeZone = 'UTC',
+                                                bool    $ssl_verify = false): array
     {
         $calendar_data = [
             'summary' => $summary,
@@ -348,7 +370,7 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function eliminar_calendario(string $access_token, string $calendar_id, bool $ssl_verify = false)
+    final public function eliminar_calendario(string $access_token, string $calendar_id, bool $ssl_verify = false): bool
     {
         $api_url = self::CALENDAR_EVENT . urlencode($calendar_id);
 
@@ -388,10 +410,10 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function crear_evento_calendario(string  $access_token, string $calendar_id, string $summary,
+    final public function crear_evento_calendario(string  $access_token, string $calendar_id, string $summary,
                                             ?string $description = null, ?string $location = null,
                                             ?array  $start_datetime = null, ?array $end_datetime = null,
-                                            ?string $timeZone = null, bool $ssl_verify = false)
+                                            ?string $timeZone = null, bool $ssl_verify = false) : array
     {
         $event_data = [
             'summary' => $summary,
@@ -462,10 +484,10 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function actualizar_evento_calendario(string  $access_token, string $calendar_id, string $event_id,
+    final public function actualizar_evento_calendario(string  $access_token, string $calendar_id, string $event_id,
                                                  string  $summary, ?string $description = null, ?string $location = null,
                                                  ?array  $start_datetime = null, ?array $end_datetime = null,
-                                                 ?string $timeZone = null, bool $ssl_verify = false)
+                                                 ?string $timeZone = null, bool $ssl_verify = false) : array
     {
         $event_data = [
             'summary' => $summary,
@@ -530,8 +552,8 @@ class GoogleCalendarApi
      * debería ser verdadero en entornos de producción
      * @throws Exception
      */
-    public function eliminar_evento_calendario(string $access_token, string $calendar_id, string $event_id,
-                                               bool   $ssl_verify = false)
+    final public function eliminar_evento_calendario(string $access_token, string $calendar_id, string $event_id,
+                                               bool   $ssl_verify = false) : bool
     {
         $api_url = self::CALENDAR_EVENT . urlencode($calendar_id) . '/events/' . urlencode($event_id);
 
