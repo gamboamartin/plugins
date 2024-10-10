@@ -4,7 +4,7 @@ namespace gamboamartin\plugins;
 
 use Exception;
 
-class telegram
+class telegram_api
 {
     /**
      * Función para obtener la URL base de la API de Telegram
