@@ -12,8 +12,108 @@ class files{
         $this->error = new errores();
     }
 
+    /**
+     * REG
+     * Asigna información a los archivos dentro de un directorio.
+     *
+     * Esta función recorre un directorio abierto y asigna datos a cada archivo encontrado utilizando `asigna_data_file()`.
+     * Valida que el parámetro `$directorio` sea un recurso de tipo `opendir()`, de lo contrario, retorna un error.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación del directorio:**
+     *    - Si `$directorio` no es un recurso válido de `opendir()`, retorna un error.
+     * 2. **Inicializa el array `$archivos`** para almacenar los datos de los archivos.
+     * 3. **Recorre el directorio con `readdir()`:**
+     *    - Para cada archivo, llama a `asigna_data_file()` para asignar sus datos.
+     *    - Si ocurre un error en `asigna_data_file()`, se retorna un mensaje de error.
+     *    - Agrega la información del archivo al array `$archivos`.
+     * 4. **Retorna el array `$archivos`** con los datos de los archivos del directorio.
+     *
+     * @param mixed $directorio Recurso del directorio obtenido con `opendir()`.
+     *
+     * @return array Retorna un array con la información de los archivos dentro del directorio.
+     * En caso de error, retorna un array con el mensaje del problema.
+     *
+     * ### Estructura de salida esperada (`stdClass` por archivo):
+     * ```php
+     * [
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => false
+     *         [name_file] => "archivo1.txt"
+     *     ),
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => true
+     *         [name_file] => "subcarpeta"
+     *     )
+     * ]
+     * ```
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Obtener archivos de un directorio
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/archivos');
+     * $resultado = asigna_archivos($dir);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => false
+     *         [name_file] => "documento.pdf"
+     *     ),
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => true
+     *         [name_file] => "imagenes"
+     *     )
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Intentar pasar una cadena en lugar de un recurso `opendir()`
+     * **Entrada:**
+     * ```php
+     * $resultado = asigna_archivos('/ruta/archivos');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error $directorio tiene que ser un recurso opendir",
+     *     "data" => "/ruta/archivos"
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Directorio vacío
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/vacia');
+     * $resultado = asigna_archivos($dir);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * []
+     * ```
+     *
+     * ### Notas:
+     * - El parámetro `$directorio` debe ser un recurso válido de `opendir()`.
+     * - Se usa `asigna_data_file()` para asignar datos a cada archivo o subdirectorio.
+     * - Si no hay archivos en el directorio, retorna un array vacío sin errores.
+     *
+     * @throws errores Si `$directorio` no es un recurso `opendir()`.
+     * @version 1.0.0
+     */
+
     private function asigna_archivos(mixed $directorio): array
     {
+        if(!is_resource($directorio)){
+            return $this->error->error(mensaje: 'Error $directorio tiene que ser un recurso opendir',
+                data: $directorio);
+        }
         $archivos = array();
         while ($archivo = readdir($directorio)){
             $data = $this->asigna_data_file(ruta: $archivo);
@@ -25,8 +125,110 @@ class files{
         return $archivos;
     }
 
-    private function asigna_data_file(string $ruta): stdClass
+    /**
+     * REG
+     * Asigna datos a un archivo o directorio basado en su ruta.
+     *
+     * Esta función recibe una ruta, la valida y genera un objeto `stdClass` con información sobre si es un directorio
+     * y el nombre del archivo o carpeta. Si la ruta está vacía, devuelve un error.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Elimina espacios en blanco** en la ruta utilizando `trim()`.
+     * 2. **Verifica que la ruta no esté vacía:** Si está vacía, retorna un error.
+     * 3. **Inicializa un objeto `stdClass` (`$data`).**
+     * 4. **Determina si la ruta corresponde a un directorio:**
+     *    - Si `is_dir($ruta)` es `true`, asigna `es_directorio = true`.
+     *    - Si no, asigna `es_directorio = false`.
+     * 5. **Guarda el nombre del archivo o carpeta** en `name_file`.
+     * 6. **Retorna el objeto `$data` con los datos asignados.**
+     *
+     * @param string $ruta Ruta del archivo o directorio a evaluar.
+     *
+     * @return array|stdClass Retorna un objeto con la información de la ruta o un array con un mensaje de error si la ruta es inválida.
+     *
+     * ### Estructura de salida (`stdClass`):
+     * ```php
+     * stdClass Object
+     * (
+     *     [es_directorio] => true|false  // Indica si la ruta es un directorio.
+     *     [name_file] => "nombre.ext"    // Nombre del archivo o carpeta.
+     * )
+     * ```
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Ruta de un archivo
+     * **Entrada:**
+     * ```php
+     * $resultado = asigna_data_file('/var/www/proyecto/index.php');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * stdClass Object
+     * (
+     *     [es_directorio] => false
+     *     [name_file] => "/var/www/proyecto/index.php"
+     * )
+     * ```
+     *
+     * #### Ejemplo 2: Ruta de un directorio
+     * **Entrada:**
+     * ```php
+     * $resultado = asigna_data_file('/var/www/proyecto/');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * stdClass Object
+     * (
+     *     [es_directorio] => true
+     *     [name_file] => "/var/www/proyecto/"
+     * )
+     * ```
+     *
+     * #### Ejemplo 3: Ruta vacía
+     * **Entrada:**
+     * ```php
+     * $resultado = asigna_data_file('');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error $ruta esta vacia",
+     *     "data" => "",
+     *     "es_final" => true
+     * ]
+     * ```
+     *
+     * #### Ejemplo 4: Ruta inexistente (se evalúa como archivo)
+     * **Entrada:**
+     * ```php
+     * $resultado = asigna_data_file('/ruta/inexistente.txt');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * stdClass Object
+     * (
+     *     [es_directorio] => false
+     *     [name_file] => "/ruta/inexistente.txt"
+     * )
+     * ```
+     *
+     * ### Notas:
+     * - La función **no verifica si el archivo o directorio existe**, solo si es un directorio.
+     * - Si la ruta está vacía, retorna un error.
+     * - Puede utilizarse para obtener información básica de una ruta antes de procesarla.
+     *
+     * @throws errores Si la ruta está vacía.
+     * @version 1.0.0
+     */
+
+    private function asigna_data_file(string $ruta): array|stdClass
     {
+        $ruta = trim($ruta);
+        if($ruta === ''){
+            return $this->error->error(mensaje: 'Error $ruta esta vacia', data: $ruta, es_final: true);
+        }
         $data = new stdClass();
         $data->es_directorio = false;
         if(is_dir($ruta)){
@@ -198,12 +400,122 @@ class files{
 
 
     /**
-     * Se asignan los datos de un servicio
+     * REG
+     * Asigna los datos de un archivo a un servicio.
+     *
+     * Esta función toma un objeto `$archivo` con información sobre un archivo y un array `$servicio`.
+     * Valida que `$archivo` contenga ciertas claves necesarias (`es_service`, `es_lock`, `es_info`, `file`),
+     * inicializa `$servicio` asegurando que tenga las claves requeridas, y asigna los valores según el tipo de archivo.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación del objeto `$archivo`:**
+     *    - Verifica que `$archivo` tenga las claves `es_service`, `es_lock`, `es_info` y `file`.
+     *    - Si alguna clave falta, retorna un error.
+     * 2. **Inicialización del array `$servicio`:**
+     *    - Usa `init_data_file_service()` para garantizar que `$servicio` tenga las claves `file`, `file_lock` y `file_info`.
+     * 3. **Asignación de valores:**
+     *    - Si `$archivo->es_service` es `true`, se asigna `file` en `$servicio`.
+     *    - Si `$archivo->es_lock` es `true`, se asigna `file_lock` en `$servicio`.
+     *    - Si `$archivo->es_info` es `true`, se asigna `file_info` en `$servicio`.
+     * 4. **Retorno del array `$servicio`** con los valores asignados.
+     *
+     * @param stdClass $archivo Objeto con los datos del archivo. Debe contener:
+     *  - `es_service` (bool): Indica si el archivo es un servicio (`.php`).
+     *  - `es_lock` (bool): Indica si el archivo es de tipo `lock`.
+     *  - `es_info` (bool): Indica si el archivo es de tipo `info`.
+     *  - `file` (string): Nombre del archivo.
+     * @param array $servicio Array de datos del servicio en el que se asignarán los valores.
+     *
+     * @return array Retorna `$servicio` con los datos del archivo asignados en las claves correctas.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Archivo de servicio (`.php`)
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "es_service" => true,
+     *     "es_lock" => false,
+     *     "es_info" => false,
+     *     "file" => "servicio.php"
+     * ];
+     * $resultado = asigna_data_service($archivo, []);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "file" => "servicio.php",
+     *     "file_lock" => "",
+     *     "file_info" => ""
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Archivo de tipo `lock`
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "es_service" => false,
+     *     "es_lock" => true,
+     *     "es_info" => false,
+     *     "file" => "proceso.lock"
+     * ];
+     * $resultado = asigna_data_service($archivo, []);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "file" => "",
+     *     "file_lock" => "proceso.lock",
+     *     "file_info" => ""
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Archivo de información (`.info`)
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "es_service" => false,
+     *     "es_lock" => false,
+     *     "es_info" => true,
+     *     "file" => "datos.info"
+     * ];
+     * $resultado = asigna_data_service($archivo, []);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "file" => "",
+     *     "file_lock" => "",
+     *     "file_info" => "datos.info"
+     * ]
+     * ```
+     *
+     * #### Ejemplo 4: Archivo sin claves necesarias
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "file" => "archivo_sin_flags.txt"
+     * ];
+     * $resultado = asigna_data_service($archivo, []);
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error al validar archivo",
+     *     "data" => [...]
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - `$archivo` debe contener las claves `es_service`, `es_lock`, `es_info` y `file`, de lo contrario, se genera un error.
+     * - `$servicio` es inicializado con `init_data_file_service()` antes de asignar valores.
+     * - Cada tipo de archivo (`.php`, `.lock`, `.info`) se asigna a una clave específica en `$servicio`.
+     *
+     * @throws errores Si la validación de `$archivo` falla.
      * @version 1.0.0
-     * @param stdClass $archivo File de services a verificar
-     * @param array $servicio servicio en verificacion
-     * @return array $servicio[file,file_lock,file_info]
      */
+
     private function asigna_data_service(stdClass $archivo, array $servicio): array
     {
         $keys = array('es_service','es_lock','es_info','file');
@@ -232,13 +544,118 @@ class files{
     }
 
     /**
-     * Se asignan los archivos de una carpeta de servicios
+     * REG
+     * Asigna los datos de un archivo a un conjunto de servicios.
+     *
+     * Esta función toma un objeto `$archivo` con información sobre un archivo y un array `$servicios`
+     * para estructurar y almacenar los archivos organizados por nombre de servicio.
+     * Primero, valida que `$archivo` contenga las claves necesarias (`name_service`, `es_service`, `es_lock`, `es_info`, `file`),
+     * luego asigna los datos del archivo al servicio correspondiente en `$servicios`.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación del objeto `$archivo`:**
+     *    - Se verifica que `$archivo` contenga `name_service`, de lo contrario, se retorna un error.
+     *    - Se valida la existencia de `es_service`, `es_lock`, `es_info`, y `file`.
+     * 2. **Inicialización del servicio en `$servicios`:**
+     *    - Si `$archivo->name_service` no está presente en `$servicios`, se inicializa como un array vacío.
+     * 3. **Asignación de los datos del archivo al servicio:**
+     *    - Se llama a `asigna_data_service()` para estructurar los datos correctamente.
+     * 4. **Retorno del array `$servicios`** con los datos del archivo asignados correctamente.
+     *
+     * @param stdClass $archivo Objeto con los datos del archivo. Debe contener:
+     *  - `name_service` (string): Nombre del servicio al que pertenece el archivo.
+     *  - `es_service` (bool): Indica si el archivo es un servicio (`.php`).
+     *  - `es_lock` (bool): Indica si el archivo es de tipo `lock`.
+     *  - `es_info` (bool): Indica si el archivo es de tipo `info`.
+     *  - `file` (string): Nombre del archivo.
+     * @param array $servicios Array con la estructura de servicios. Puede estar vacío o contener datos previos.
+     *
+     * @return array Retorna `$servicios` con los datos del archivo organizados bajo la clave `name_service`.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Agregar un archivo de servicio (`.php`) a un conjunto vacío
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "name_service" => "servicio1",
+     *     "es_service" => true,
+     *     "es_lock" => false,
+     *     "es_info" => false,
+     *     "file" => "servicio1.php"
+     * ];
+     * $resultado = asigna_servicios($archivo, []);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "servicio1" => [
+     *         "file" => "servicio1.php",
+     *         "file_lock" => "",
+     *         "file_info" => ""
+     *     ]
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Agregar un archivo `lock` a un servicio existente
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "name_service" => "servicio1",
+     *     "es_service" => false,
+     *     "es_lock" => true,
+     *     "es_info" => false,
+     *     "file" => "servicio1.lock"
+     * ];
+     * $servicios = [
+     *     "servicio1" => [
+     *         "file" => "servicio1.php",
+     *         "file_lock" => "",
+     *         "file_info" => ""
+     *     ]
+     * ];
+     * $resultado = asigna_servicios($archivo, $servicios);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "servicio1" => [
+     *         "file" => "servicio1.php",
+     *         "file_lock" => "servicio1.lock",
+     *         "file_info" => ""
+     *     ]
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Archivo sin `name_service`
+     * **Entrada:**
+     * ```php
+     * $archivo = (object) [
+     *     "es_service" => true,
+     *     "es_lock" => false,
+     *     "es_info" => false,
+     *     "file" => "servicio1.php"
+     * ];
+     * $resultado = asigna_servicios($archivo, []);
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error al validar archivo",
+     *     "data" => [...]
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - `$archivo` debe contener `name_service` y las claves necesarias (`es_service`, `es_lock`, `es_info`, `file`).
+     * - Si un servicio ya existe en `$servicios`, los datos se asignan correctamente sin sobrescribir los existentes.
+     * - Se usa `asigna_data_service()` para mantener la estructura de los archivos dentro de `$servicios`.
+     *
+     * @throws errores Si la validación de `$archivo` falla.
      * @version 1.0.0
-     * @param stdClass $archivo datos ocn ruta del servicio
-     * @param array $servicios conjunto de servicios recursivos
-     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info] pueden ser
-     * varios
      */
+
     private function asigna_servicios(stdClass $archivo, array $servicios): array
     {
         $keys = array('name_service');
@@ -624,12 +1041,103 @@ class files{
 
 
     /**
-     * Obtiene la estructura de una carpeta
+     * REG
+     * Obtiene la estructura de un directorio y asigna información a sus archivos y subdirectorios.
+     *
+     * Esta función valida que la ruta proporcionada sea un directorio válido, lo abre y extrae su contenido,
+     * organizando la información de cada archivo y subdirectorio utilizando `asigna_archivos()`.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación de la ruta:**
+     *    - Se eliminan los espacios en blanco con `trim()`.
+     *    - Se valida que la ruta sea un directorio existente usando `valida_folder()`.
+     *    - Si la validación falla, retorna un error.
+     * 2. **Apertura del directorio:**
+     *    - Se intenta abrir el directorio con `opendir($ruta)`.
+     *    - Si la apertura falla, se retorna un error.
+     * 3. **Obtención y asignación de archivos:**
+     *    - Se llama a `asigna_archivos()` para obtener la información de los archivos y subdirectorios dentro de la ruta.
+     *    - Si hay un error en la asignación, se retorna un mensaje de error.
+     * 4. **Retorno de la estructura de archivos y subdirectorios.**
+     *
+     * @param string $ruta Ruta del directorio a analizar.
+     *
+     * @return array Retorna un array con la información de los archivos y subdirectorios encontrados en `$ruta`.
+     * En caso de error, retorna un array con el mensaje del problema.
+     *
+     * ### Estructura de salida esperada (`stdClass` por archivo/directorio):
+     * ```php
+     * [
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => false
+     *         [name_file] => "archivo1.txt"
+     *     ),
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => true
+     *         [name_file] => "subcarpeta"
+     *     )
+     * ]
+     * ```
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Obtener la estructura de un directorio válido
+     * **Entrada:**
+     * ```php
+     * $resultado = estructura('/var/www/proyecto/');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => false
+     *         [name_file] => "index.php"
+     *     ),
+     *     stdClass Object
+     *     (
+     *         [es_directorio] => true
+     *         [name_file] => "css"
+     *     )
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Ruta inexistente
+     * **Entrada:**
+     * ```php
+     * $resultado = estructura('/ruta/inexistente/');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error al validar ruta",
+     *     "data" => [...]
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Directorio vacío
+     * **Entrada:**
+     * ```php
+     * $resultado = estructura('/ruta/vacia/');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * []
+     * ```
+     *
+     * ### Notas:
+     * - La función **no crea el directorio**, solo valida su existencia.
+     * - Si la ruta es válida pero no contiene archivos, retorna un array vacío sin errores.
+     * - Se usa `opendir()` para abrir la carpeta, pero **no se cierra automáticamente**, ya que `readdir()` se encarga de la lectura.
+     *
+     * @throws errores Si la validación de la ruta falla o el directorio no puede abrirse.
      * @version 1.0.0
-     * @param string $ruta debe ser una carpeta con ruta absoluta
-     * @return array un array de objetos $result[n]->es_directorio y $result[n]->name_file
      */
-    public function estructura(string $ruta): array
+
+    private function estructura(string $ruta): array
     {
         $ruta = trim($ruta);
         $valida = $this->valida_folder(ruta: $ruta);
@@ -738,10 +1246,96 @@ class files{
 
 
     /**
-     * Ajusta los archivos dentro de la carpeta services para su maquetacion
-     * @param mixed $directorio Recurso tipo opendir
-     * @return array un arreglo de objetos
+     * REG
+     * Obtiene y procesa los archivos dentro de un directorio de servicios.
+     *
+     * Esta función recorre un directorio abierto y extrae los archivos válidos para su procesamiento,
+     * excluyendo aquellos que sean directorios o archivos específicos como `index.php` e `init.php`.
+     * Solo se incluyen archivos que tengan una extensión válida.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación del directorio:** Si el parámetro `$directorio` es una cadena en lugar de un recurso `opendir()`, retorna un error.
+     * 2. **Inicialización de la lista de archivos:** Se declara un array vacío `$archivos`.
+     * 3. **Recorrido del directorio:** Se utiliza `readdir()` para iterar sobre los archivos dentro del directorio.
+     * 4. **Filtrado de archivos:**
+     *    - Si el elemento es un directorio (`is_dir($archivo)`), se omite.
+     *    - Si el archivo es `index.php` o `init.php`, se omite.
+     *    - Si el archivo no tiene extensión (`tiene_extension($archivo) === false`), se omite.
+     * 5. **Asignación de datos al archivo:** Se llama a `asigna_data_file_service($archivo)`, validando su contenido.
+     * 6. **Manejo de errores:** Si la asignación falla (`errores::$error` es `true`), se retorna un error.
+     * 7. **Ordenación de la lista de archivos:** Se ordena el array `$archivos` usando `asort()`.
+     * 8. **Retorno del resultado:** Devuelve un array con los archivos procesados.
+     *
+     * @param mixed $directorio Recurso del directorio obtenido con `opendir()`.
+     *
+     * @return array Un array de archivos procesados, excluyendo directorios y archivos irrelevantes.
+     * En caso de error, retorna un array con la información del problema.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Directorio con archivos válidos
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/servicios');
+     * $resultado = files_services($dir);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     stdClass Object
+     *     (
+     *         [file] => servicio1.php
+     *         [es_lock] => false
+     *         [es_info] => false
+     *         [es_service] => true
+     *         [name_service] => servicio1
+     *     ),
+     *     stdClass Object
+     *     (
+     *         [file] => servicio2.php
+     *         [es_lock] => false
+     *         [es_info] => false
+     *         [es_service] => true
+     *         [name_service] => servicio2
+     *     )
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Directorio con archivos sin extensión
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/servicios');
+     * $resultado = files_services($dir);
+     * ```
+     * **Salida esperada (si solo hay archivos sin extensión):**
+     * ```php
+     * []
+     * ```
+     *
+     * #### Ejemplo 3: Intento de pasar un string en lugar de un recurso `opendir()`
+     * **Entrada:**
+     * ```php
+     * $resultado = files_services('/ruta/servicios');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error el directorio no puede ser un string",
+     *     "data" => "/ruta/servicios"
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - La función **no cierra el directorio**, la gestión de `closedir()` debe hacerse externamente.
+     * - Se excluyen archivos `index.php` e `init.php` por convención.
+     * - La validación de la extensión se hace con `tiene_extension()`, evitando archivos sin extensión.
+     * - Se devuelve un array vacío si no hay archivos válidos.
+     *
+     * @throws errores Si la validación de archivos o directorio falla.
+     * @version 1.0.0
      */
+
     private function files_services(mixed $directorio): array
     {
         if(is_string($directorio)){
@@ -816,14 +1410,93 @@ class files{
     }
 
     /**
-     * @param mixed $directorio Recurso tipo opendir
-     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info]
-     * pueden ser varios
+     * REG
+     * Obtiene y organiza los archivos de servicios desde un directorio.
+     *
+     * Esta función procesa un directorio abierto, extrae los archivos válidos y los organiza en una estructura de servicios.
+     * Primero, obtiene los archivos del directorio utilizando `files_services()`, luego estructura los datos con `maqueta_files_service()`.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Validación del directorio:**
+     *    - Si `$directorio` es una cadena en lugar de un recurso `opendir()`, retorna un error.
+     * 2. **Obtención de archivos:**
+     *    - Llama a `files_services()` para recuperar los archivos del directorio.
+     *    - Si hay un error en la obtención, retorna un mensaje de error.
+     * 3. **Estructuración de archivos en servicios:**
+     *    - Llama a `maqueta_files_service()` para organizar los archivos en un array de servicios.
+     *    - Si hay un error en la maquetación, retorna un mensaje de error.
+     * 4. **Retorno de los servicios organizados.**
+     *
+     * @param mixed $directorio Recurso del directorio obtenido con `opendir()`.
+     *
+     * @return array Retorna un array con los archivos organizados por `name_service`.
+     * En caso de error, retorna un array con el mensaje del problema.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Obtención de archivos desde un directorio válido
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/servicios');
+     * $resultado = get_files_services($dir);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "servicio1" => [
+     *         "file" => "servicio1.php",
+     *         "file_lock" => "servicio1.lock",
+     *         "file_info" => ""
+     *     ],
+     *     "servicio2" => [
+     *         "file" => "servicio2.php",
+     *         "file_lock" => "",
+     *         "file_info" => ""
+     *     ]
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Pasar un string en lugar de un recurso `opendir()`
+     * **Entrada:**
+     * ```php
+     * $resultado = get_files_services('/ruta/servicios');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error el directorio no puede ser un string",
+     *     "data" => "/ruta/servicios",
+     *     "es_final" => true
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Directorio sin archivos válidos
+     * **Entrada:**
+     * ```php
+     * $dir = opendir('/ruta/vacia');
+     * $resultado = get_files_services($dir);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * []
+     * ```
+     *
+     * ### Notas:
+     * - El parámetro `$directorio` debe ser un recurso `opendir()`, no una cadena de texto.
+     * - Se usa `files_services()` para extraer archivos válidos del directorio.
+     * - Se usa `maqueta_files_service()` para estructurar los archivos en servicios.
+     * - Si no hay archivos válidos en el directorio, retorna un array vacío sin errores.
+     *
+     * @throws errores Si `$directorio` no es válido o hay un problema en la extracción de archivos.
+     * @version 1.0.0
      */
-    public function get_files_services(mixed $directorio): array
+
+    private function get_files_services(mixed $directorio): array
     {
         if(is_string($directorio)){
-            return $this->error->error(mensaje:  'Error el directorio no puede ser un string',data: $directorio);
+            return $this->error->error(mensaje:  'Error el directorio no puede ser un string',data: $directorio,
+                es_final: true);
         }
 
         $archivos = $this->files_services(directorio: $directorio);
@@ -871,10 +1544,79 @@ class files{
     }
 
     /**
-     * Si los keys de file, file_lock y file_info no existen los inicializa como vacios
-     * @param array $servicio servicio en verificacion puede estar vacio
-     * @return array $servicio[file,file_lock,file_info] todos vacios si no existen
+     * REG
+     * Inicializa un array con claves predeterminadas para un servicio de archivo.
+     *
+     * Esta función asegura que el array `$servicio` contenga las claves necesarias (`file`, `file_lock`, `file_info`).
+     * Si alguna de estas claves no existe en el array, se inicializa con un valor vacío (`''`).
+     *
+     * ### Flujo de ejecución:
+     * 1. **Verificación y asignación de claves:**
+     *    - Si la clave `'file'` no está presente en `$servicio`, se establece con `''`.
+     *    - Si la clave `'file_lock'` no está presente en `$servicio`, se establece con `''`.
+     *    - Si la clave `'file_info'` no está presente en `$servicio`, se establece con `''`.
+     * 2. **Retorno del array ajustado:** Devuelve `$servicio` con las claves garantizadas.
+     *
+     * @param array $servicio Array de datos del servicio. Puede estar vacío o contener algunas claves.
+     *
+     * @return array Retorna el array `$servicio` asegurando que contiene las claves `file`, `file_lock` y `file_info`.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Array vacío
+     * **Entrada:**
+     * ```php
+     * $resultado = init_data_file_service([]);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "file" => "",
+     *     "file_lock" => "",
+     *     "file_info" => ""
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Array con una clave preexistente
+     * **Entrada:**
+     * ```php
+     * $resultado = init_data_file_service(["file" => "servicio.php"]);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "file" => "servicio.php",
+     *     "file_lock" => "",
+     *     "file_info" => ""
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Array con todas las claves definidas
+     * **Entrada:**
+     * ```php
+     * $resultado = init_data_file_service([
+     *     "file" => "servicio.php",
+     *     "file_lock" => "servicio.lock",
+     *     "file_info" => "servicio.info"
+     * ]);
+     * ```
+     * **Salida esperada (sin cambios):**
+     * ```php
+     * [
+     *     "file" => "servicio.php",
+     *     "file_lock" => "servicio.lock",
+     *     "file_info" => "servicio.info"
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - Si el array de entrada ya contiene todas las claves, no se modifica.
+     * - Si una clave no existe, se agrega con el valor `''`.
+     * - Útil para garantizar que el array tenga la estructura correcta antes de procesarlo.
+     *
+     * @version 1.0.0
      */
+
     private function init_data_file_service(array $servicio): array
     {
         if(!isset( $servicio['file'])){
@@ -919,11 +1661,100 @@ class files{
     }
 
     /**
-     * Maqueta los archivos para dar salida a un array con los servicios a mostrar en un index
+     * REG
+     * Organiza y estructura los archivos de servicio en un array de servicios.
+     *
+     * Esta función toma un array de archivos y los agrupa en un array estructurado por nombre de servicio.
+     * Para cada archivo, se verifica que sea un objeto (`stdClass`), y luego se asigna al servicio correspondiente
+     * utilizando `asigna_servicios()`.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Inicialización del array `$servicios`.**
+     * 2. **Iteración sobre el array `$archivos`:**
+     *    - Verifica si `$archivo` es un objeto (`stdClass`). Si no lo es, retorna un error.
+     *    - Llama a `asigna_servicios()` para asignar los archivos al servicio correspondiente.
+     *    - Si ocurre un error en `asigna_servicios()`, se retorna un mensaje de error.
+     * 3. **Retorno del array `$servicios` con la estructura organizada.**
+     *
+     * @param array $archivos Array de archivos de servicio. Cada elemento debe ser un objeto `stdClass`.
+     *
+     * @return array Retorna un array `$servicios` estructurado con los archivos organizados por `name_service`.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Organización de archivos de servicio
+     * **Entrada:**
+     * ```php
+     * $archivos = [
+     *     (object) [
+     *         "name_service" => "servicio1",
+     *         "es_service" => true,
+     *         "es_lock" => false,
+     *         "es_info" => false,
+     *         "file" => "servicio1.php"
+     *     ],
+     *     (object) [
+     *         "name_service" => "servicio1",
+     *         "es_service" => false,
+     *         "es_lock" => true,
+     *         "es_info" => false,
+     *         "file" => "servicio1.lock"
+     *     ],
+     *     (object) [
+     *         "name_service" => "servicio2",
+     *         "es_service" => true,
+     *         "es_lock" => false,
+     *         "es_info" => false,
+     *         "file" => "servicio2.php"
+     *     ]
+     * ];
+     * $resultado = maqueta_files_service($archivos);
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * [
+     *     "servicio1" => [
+     *         "file" => "servicio1.php",
+     *         "file_lock" => "servicio1.lock",
+     *         "file_info" => ""
+     *     ],
+     *     "servicio2" => [
+     *         "file" => "servicio2.php",
+     *         "file_lock" => "",
+     *         "file_info" => ""
+     *     ]
+     * ]
+     * ```
+     *
+     * #### Ejemplo 2: Archivo inválido (no es un objeto `stdClass`)
+     * **Entrada:**
+     * ```php
+     * $archivos = [
+     *     [
+     *         "name_service" => "servicio1",
+     *         "file" => "servicio1.php"
+     *     ]
+     * ];
+     * $resultado = maqueta_files_service($archivos);
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error el archivo debe ser un stdclass",
+     *     "data" => [...]
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - Todos los elementos en `$archivos` deben ser instancias de `stdClass`.
+     * - Se usa `asigna_servicios()` para estructurar correctamente los datos.
+     * - Si `$archivos` está vacío, retorna un array vacío sin errores.
+     *
+     * @throws errores Si algún archivo no es un objeto `stdClass`.
      * @version 1.0.0
-     * @param array $archivos conjunto de datos de archivos para su maquetacion
-     * @return array retorna los servicios ajustados  $servicios[name_service][file,file_lock,file_info] pueden ser varios
      */
+
     private function maqueta_files_service(array $archivos): array
     {
         $servicios = array();
@@ -1201,8 +2032,108 @@ class files{
         return $data;
     }
 
+    /**
+     * REG
+     * Verifica si un archivo tiene una extensión válida.
+     *
+     * Esta función evalúa si el nombre de un archivo contiene una extensión, basándose en la presencia de un punto (`.`).
+     * Si el archivo no tiene un punto o solo tiene uno sin contenido posterior, se considera que no tiene extensión.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Eliminar espacios en blanco:** Se recorta el nombre del archivo utilizando `trim()`.
+     * 2. **Dividir el nombre por los puntos:** Se usa `explode('.', $archivo)`.
+     * 3. **Contar los fragmentos resultantes:** Si solo hay un fragmento (`count($explode) === 1`), el archivo no tiene extensión.
+     * 4. **Retornar el resultado:** Devuelve `true` si tiene extensión, `false` si no la tiene.
+     *
+     * @param string $archivo Nombre del archivo a evaluar.
+     *
+     * @return bool `true` si el archivo tiene una extensión válida, `false` si no la tiene.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Archivo con extensión válida
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('documento.txt');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * true
+     * ```
+     *
+     * #### Ejemplo 2: Archivo sin extensión
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('documento');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * false
+     * ```
+     *
+     * #### Ejemplo 3: Archivo que termina en punto
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('archivo.');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * false
+     * ```
+     *
+     * #### Ejemplo 4: Archivo con múltiples extensiones
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('backup.tar.gz');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * true
+     * ```
+     *
+     * #### Ejemplo 5: Archivo compuesto solo por puntos
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('...');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * false
+     * ```
+     *
+     * #### Ejemplo 6: Archivo con espacios en blanco alrededor
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('   foto.png   ');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * true
+     * ```
+     *
+     * #### Ejemplo 7: Nombre vacío
+     * **Entrada:**
+     * ```php
+     * $resultado = tiene_extension('');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * false
+     * ```
+     *
+     * ### Notas:
+     * - La función **solo verifica la presencia de un punto (`.`)**, no si la extensión es válida.
+     * - Si el archivo **termina en un punto (`archivo.`)**, se considera que **no tiene extensión**.
+     * - Si un archivo **tiene varias extensiones (`backup.tar.gz`)**, el resultado sigue siendo `true`.
+     * - Se recomienda **validar que la extensión sea correcta** en otra función si es necesario.
+     *
+     * @throws errores Si el parámetro no es una cadena de texto.
+     * @version 1.0.0
+     */
+
     private function tiene_extension(string $archivo): bool
     {
+        $archivo = trim($archivo);
         $tiene_extension = true;
         $explode = explode('.', $archivo);
         if(count($explode) === 1){
@@ -1401,19 +2332,82 @@ class files{
 
 
     /**
-     * Verifica que la ruta sea un folder
+     * REG
+     * Valida si una ruta corresponde a un directorio existente.
+     *
+     * Esta función verifica que la ruta proporcionada no esté vacía y que corresponda a un directorio válido en el sistema de archivos.
+     * Si la ruta no cumple con estos criterios, devuelve un error detallado.
+     *
+     * ### Flujo de ejecución:
+     * 1. **Elimina espacios en blanco** en la ruta utilizando `trim()`.
+     * 2. **Verifica que la ruta no esté vacía:** Si está vacía, retorna un error.
+     * 3. **Verifica que la ruta sea un directorio válido:** Si la ruta no existe o no es un directorio, retorna un error.
+     * 4. **Si la ruta es válida, retorna `true`.**
+     *
+     * @param string $ruta Ruta del directorio a validar.
+     *
+     * @return bool|array Retorna `true` si la ruta es válida, o un array con un mensaje de error en caso contrario.
+     *
+     * ### Ejemplos de uso:
+     *
+     * #### Ejemplo 1: Validar un directorio existente
+     * **Entrada:**
+     * ```php
+     * $resultado = valida_folder('/var/www/proyecto/');
+     * ```
+     * **Salida esperada:**
+     * ```php
+     * true
+     * ```
+     *
+     * #### Ejemplo 2: Ruta vacía
+     * **Entrada:**
+     * ```php
+     * $resultado = valida_folder('');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error la ruta esta vacio",
+     *     "data" => "",
+     *     "es_final" => true
+     * ]
+     * ```
+     *
+     * #### Ejemplo 3: Ruta no existente
+     * **Entrada:**
+     * ```php
+     * $resultado = valida_folder('/ruta/invalida/');
+     * ```
+     * **Salida esperada (error):**
+     * ```php
+     * [
+     *     "error" => true,
+     *     "mensaje" => "Error la ruta no existe o no es una carpeta",
+     *     "data" => "/ruta/invalida/",
+     *     "es_final" => true
+     * ]
+     * ```
+     *
+     * ### Notas:
+     * - La función **no crea la carpeta** si no existe, solo valida su existencia.
+     * - Si la ruta está vacía o no es un directorio, se retorna un error detallado.
+     * - Se recomienda llamar a esta función antes de realizar operaciones con directorios.
+     *
+     * @throws errores Si la ruta no es válida o está vacía.
      * @version 1.0.0
-     * @param string $ruta Ruta a verificar
-     * @return bool|array true si es correcto
      */
+
     private function valida_folder(string $ruta): bool|array
     {
         $ruta = trim($ruta);
         if($ruta === ''){
-            return $this->error->error(mensaje: 'Error la ruta esta vacio', data: $ruta);
+            return $this->error->error(mensaje: 'Error la ruta esta vacio', data: $ruta, es_final: true);
         }
         if(!is_dir($ruta)){
-            return $this->error->error(mensaje: 'Error la ruta no existe o no es una carpeta', data: $ruta);
+            return $this->error->error(mensaje: 'Error la ruta no existe o no es una carpeta', data: $ruta,
+                es_final: true);
         }
         return true;
     }

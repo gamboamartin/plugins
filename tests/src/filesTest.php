@@ -17,6 +17,54 @@ class filesTest extends test {
         $this->errores = new errores();
     }
 
+    public function test_asigna_archivos()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $directorio = opendir('/var/www/html/plugins');
+        $resultado = $fl->asigna_archivos($directorio);
+
+        //print_r($resultado);exit;
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("src", $resultado[1]->name_file);
+        $this->assertTrue( $resultado[1]->es_directorio);
+
+        errores::$error = false;
+
+
+
+    }
+
+    public function test_asigna_data_file()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $ruta = '.';
+        $resultado = $fl->asigna_data_file($ruta);
+
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals(".", $resultado->name_file);
+        $this->assertTrue( $resultado->es_directorio);
+
+        errores::$error = false;
+
+        $ruta = 'filesTest.php';
+        $resultado = $fl->asigna_data_file($ruta);
+        $this->assertIsObject($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals("filesTest.php", $resultado->name_file);
+        $this->assertNotTrue( $resultado->es_directorio);
+
+        errores::$error = false;
+
+    }
+
     public function test_asigna_data_file_service()
     {
         errores::$error = false;
@@ -200,7 +248,7 @@ class filesTest extends test {
     public function test_estructura(){
         errores::$error = false;
         $fl = new files();
-        //$fl = new liberator($fl);
+        $fl = new liberator($fl);
 
         $ruta = '';
         $resultado = $fl->estructura($ruta);
@@ -218,10 +266,11 @@ class filesTest extends test {
         errores::$error = false;
         $ruta = '/var/www/html/plugins/tests/services';
         $resultado = $fl->estructura($ruta);
+        //print_r($resultado);exit;
 
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
-        $this->assertEquals("service1.php.lock", $resultado[0]->name_file);
+        $this->assertEquals("service1.php.lock", $resultado[2]->name_file);
         errores::$error = false;
     }
     public function test_extension(){
@@ -283,7 +332,7 @@ class filesTest extends test {
     {
         errores::$error = false;
         $fl = new files();
-        //$fl = new liberator($fl);
+        $fl = new liberator($fl);
 
         //$directorio = '/var/www/html/plugins/tests/services';
         $directorio = opendir('/var/www/html/plugins/tests/services');
@@ -345,7 +394,26 @@ class filesTest extends test {
         errores::$error = false;
     }
 
-    public function test_maqueta_files_services()
+    public function test_init_data_file_service()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
+
+        $servicio = array();
+        $resultado = $fl->init_data_file_service($servicio);
+
+        $this->assertIsArray($resultado);
+        $this->assertNotTrue(errores::$error);
+        $this->assertEquals('', $resultado['file']);
+        $this->assertEquals('', $resultado['file_lock']);
+        $this->assertEquals('', $resultado['file_info']);
+
+        errores::$error = false;
+
+    }
+
+    public function test_maqueta_files_service()
     {
         errores::$error = false;
         $fl = new files();
@@ -442,7 +510,36 @@ class filesTest extends test {
         errores::$error = false;
     }
 
+    public function test_tiene_extension()
+    {
+        errores::$error = false;
+        $fl = new files();
+        $fl = new liberator($fl);
 
+        $archivo = '';
+        $resultado = $fl->tiene_extension($archivo);
+
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+
+        $archivo = 'x';
+        $resultado = $fl->tiene_extension($archivo);
+        $this->assertIsBool($resultado);
+        $this->assertNotTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+
+        errores::$error = false;
+
+        $archivo = 'x.x';
+        $resultado = $fl->tiene_extension($archivo);
+        $this->assertIsBool($resultado);
+        $this->assertTrue($resultado);
+        $this->assertNotTrue(errores::$error);
+        errores::$error = false;
+    }
 
     public function test_todo_vacio()
     {

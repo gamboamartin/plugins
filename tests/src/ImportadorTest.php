@@ -27,6 +27,7 @@ class ImportadorTest extends test {
         $inputFileType = 'Ods';
         $celda_inicio = 'A1';
         $resultado = $importador->rows($celda_inicio, $inputFileType, $ruta_absoluta);
+        //print_r($resultado);exit;
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
         $this->assertEquals("id", $resultado[0][0]);
