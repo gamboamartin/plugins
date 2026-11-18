@@ -1,0 +1,12 @@
+{
+  "require": {
+    "gamboa.martin/errores": "^6.0.0",
+    "gamboa.martin/test": "^5.0.0",
+    "gamboa.martin/validacion": "^5.0.0",
+    "phpoffice/phpspreadsheet": "^1.16",
+    "phpunit/phpunit": "^10.0.0"
+  },
+  "config": {
+    "allow-plugins": false
+  }
+}

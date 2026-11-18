@@ -30,6 +30,7 @@
         "ext-curl": "*",
         "ext-iconv": "*",
         "ext-libxml": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "ext-openssl": "*"
     }
 }

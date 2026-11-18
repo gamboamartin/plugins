@@ -29,7 +29,7 @@ class Importador
         }
 
         $columna = $columnas[$j];
-        $value = $rows[$i][$j];
+        $value = $rows[$i][$j] ?? null;
         if(!is_null($value)){
             $value = str_replace("'", "", $value);
         }

@@ -1,0 +1,14 @@
+{
+  "tipo": "caracterizacion_controlador_con_dobles",
+  "casos": [
+    "exito",
+    "error_key",
+    "error_cer"
+  ],
+  "no_acredita": [
+    "alta integral",
+    "recuperaci\u00f3n de archivos",
+    "ausencia de secretos en POST o sesi\u00f3n"
+  ],
+  "fuente_controlador_sha256": "647d6ea9476184521151ee85358a51caf092f80965a49ec38897931c423d380e"
+}

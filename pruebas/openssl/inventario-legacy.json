@@ -1,0 +1,15 @@
+{
+  "base": "d67d677b1b42374b887fd0a9d59e1261e897ba04",
+  "archivos_conservados_sin_cambios": {
+    "tests/cat_sat_tipo_relacion": "3fcb0b33d6bbc51d3cfeba6047abd4557839d984f2a32d2c73b53a8d3785e827",
+    "tests/services/service1.php": "00aba3928cd622ad67c0f81ecd5aa8699e07f8f4908c045fe34f6a2dc0067b37",
+    "tests/services/service1.php.lock": "00aba3928cd622ad67c0f81ecd5aa8699e07f8f4908c045fe34f6a2dc0067b37",
+    "tests/services/service2.php": "00aba3928cd622ad67c0f81ecd5aa8699e07f8f4908c045fe34f6a2dc0067b37",
+    "tests/services/service2.php.lock": "00aba3928cd622ad67c0f81ecd5aa8699e07f8f4908c045fe34f6a2dc0067b37",
+    "tests/src/ImportadorTest.php": "fe64ada6ab86de71e9c1410bd46d7af7b401880d548b5b9286abd98f731379fc",
+    "tests/src/exportador/datosTest.php": "f0c78378ba4a46c4ca463bf30021279cabc4ba5aacf342c044d57583c134b71c",
+    "tests/src/exportador/patternsTest.php": "5b7b983cc8913bf0862418461271066b0c6bba3fb22a15ed6f7b39f727d575be",
+    "tests/src/filesTest.php": "326d286f40df3f0f6ab78e71749faf249c39d7c372e86a12fc5aebd8b14206a5"
+  },
+  "limites": "No ejecutadas: rutas absolutas /var/www/html/plugins, config externa y fixture ODS; no sustituir expectativas ni ejecutar sobre datos reales."
+}

@@ -29,8 +29,20 @@ class filesTest extends test {
         //print_r($resultado);exit;
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
-        $this->assertEquals("src", $resultado[1]->name_file);
-        $this->assertTrue( $resultado[1]->es_directorio);
+        // El contrato enumera todos los archivos; readdir no garantiza posición.
+        $esperados = scandir('/var/www/html/plugins');
+        $nombres = array_map(static fn($archivo) => $archivo->name_file, $resultado);
+        sort($nombres);
+        $this->assertSame($esperados, $nombres);
+        $por_nombre = array_column($resultado, null, 'name_file');
+        $this->assertArrayHasKey('src', $por_nombre);
+        $this->assertTrue($por_nombre['src']->es_directorio);
+        foreach ($resultado as $archivo) {
+            $this->assertSame(
+                is_dir('/var/www/html/plugins/' . $archivo->name_file),
+                $archivo->es_directorio
+            );
+        }
 
         errores::$error = false;
 
@@ -270,7 +282,10 @@ class filesTest extends test {
 
         $this->assertIsArray($resultado);
         $this->assertNotTrue(errores::$error);
-        $this->assertEquals("service1.php.lock", $resultado[2]->name_file);
+        $nombres = array_map(static fn($archivo) => $archivo->name_file, $resultado);
+        sort($nombres);
+        $this->assertSame(scandir($ruta), $nombres);
+        $this->assertContains('service1.php.lock', $nombres);
         errores::$error = false;
     }
     public function test_extension(){
